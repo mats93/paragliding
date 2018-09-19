@@ -1,5 +1,5 @@
 /*
-  File: functions.go
+	File: functions.go
   Contains helper functions for the http handle function calls.
 */
 
@@ -34,6 +34,7 @@ func retriveTrackById(id int) (track, error) {
 func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 	// Converts the IDs to a "json list".
 	// Loops through all IDs and formats them.
+	// ToDo -> Encode to json properly.
 	message := "["
 	for i := 0; i < len(trackSlice); i++ {
 		// Converts int to string.
@@ -96,6 +97,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 					trackFile.GliderID, sum})
 
 			// Converts the id to json format.
+			// ToDo -> Encode to json properly.
 			jsonID := fmt.Sprintf("{\"id\": %d}", lastUsedID)
 
 			// Sets header content-type to application/json and status code to 200 (OK).

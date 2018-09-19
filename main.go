@@ -15,7 +15,8 @@
 		By Mats Ove Mandt Skjærstein.
 
   ToDo:
-	  Splitt opp i forskjellige filer.
+	  Ha med error output med http.Error().
+		Endre id liste og id til json, ikke bruk "selvlagd" json formatering.
 	  Skriv unit tester.
 */
 
