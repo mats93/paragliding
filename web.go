@@ -14,6 +14,7 @@ ToDo:
 	Splitt opp i forskjellige filer.
 	Skriv unit tester.
 
+
 By Mats
 */
 
