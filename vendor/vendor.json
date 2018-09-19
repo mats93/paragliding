@@ -1,0 +1,64 @@
+{
+	"comment": "",
+	"heroku": {
+		"goVersion": "go1.11"
+	},
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "EFaoU18lhtrjqhlADkSjJkUAWIA=",
+			"path": "github.com/golang/geo/r1",
+			"revision": "635502111454809c6a2c3e92d5ef0454706164f5",
+			"revisionTime": "2018-08-26T21:09:00Z"
+		},
+		{
+			"checksumSHA1": "IQvAdnayIiKDyxMYBkMAUtStuPs=",
+			"path": "github.com/golang/geo/r2",
+			"revision": "635502111454809c6a2c3e92d5ef0454706164f5",
+			"revisionTime": "2018-08-26T21:09:00Z"
+		},
+		{
+			"checksumSHA1": "Z9lm/pDQVZeNJu93e8B3/N05Ezk=",
+			"path": "github.com/golang/geo/r3",
+			"revision": "635502111454809c6a2c3e92d5ef0454706164f5",
+			"revisionTime": "2018-08-26T21:09:00Z"
+		},
+		{
+			"checksumSHA1": "IHAp4p0e4Kt7UZfL5HHYABUJ8PI=",
+			"path": "github.com/golang/geo/s1",
+			"revision": "635502111454809c6a2c3e92d5ef0454706164f5",
+			"revisionTime": "2018-08-26T21:09:00Z"
+		},
+		{
+			"checksumSHA1": "2vapwMZRXg34Uf7Tt2Kl/UaOdYE=",
+			"path": "github.com/golang/geo/s2",
+			"revision": "635502111454809c6a2c3e92d5ef0454706164f5",
+			"revisionTime": "2018-08-26T21:09:00Z"
+		},
+		{
+			"checksumSHA1": "Ld1fkCBbtUqRg3qu1gZKpP2OyO4=",
+			"path": "github.com/gorilla/mux",
+			"revision": "9e1f5955c0d22b55d9e20d6faa28589f83b2faca",
+			"revisionTime": "2018-09-03T15:43:05Z"
+		},
+		{
+			"checksumSHA1": "pHOBAFXNfJ1FX5JwsjcbQ8Rg5Bc=",
+			"path": "github.com/marni/goigc",
+			"revision": "71f274dd21ef320ccbb6c6271c7df7fd8a908779",
+			"revisionTime": "2018-09-09T23:15:54Z"
+		},
+		{
+			"checksumSHA1": "slZTw21d5azlfVgYlmjX93LuZnw=",
+			"path": "github.com/rickb777/date/period",
+			"revision": "ee30139c88e657c21e64e98ec536029f6fe1f50c",
+			"revisionTime": "2018-09-10T12:32:32Z"
+		},
+		{
+			"checksumSHA1": "lascvTZMKUFxd00N5jjFXMUr9MM=",
+			"path": "github.com/rickb777/plural",
+			"revision": "7589705ae1b0a218b5389c04b1505e0c8defbc1f",
+			"revisionTime": "2018-06-30T11:26:35Z"
+		}
+	],
+	"rootPath": "github.com/Heroku/igcinfo"
+}
