@@ -9,13 +9,10 @@ instead it wil store submitted tracks in memory.
 This app wil run in Heroku.
 
 ToDo:
-  Add "content-type" for header.
-  Sjekk om response header (404 osv) stemmer.
 	Splitt opp i forskjellige filer.
 	Skriv unit tester.
 
-
-By Mats
+By Mats Ove Mandt Skjærstein.
 */
 
 package main
@@ -263,29 +260,42 @@ func getDetailedTrack(w http.ResponseWriter, r *http.Request) {
 	// Gets the field and ID from the URL, converts the ID to an integer.
 	fmt.Sscanf(r.URL.Path, "/igcinfo/api/igc/%d/%s", &id, &field)
 
-	/*
-		Id           int       `json:"-"`
-		H_date       time.Time `json:"H_date"`
-		Pilot        string    `json:"pilot"`
-		Glider       string    `json:"glider"`
-		Glider_id    string    `json:"glider_id"`
-		Track_length float64   `json:"track_length"`
-	*/
+	// Tries to retrive the track with the requestet ID.
+	// Retrieves the ID from the url.
+	if rTrack, err := retriveTrackById(id); err == nil {
+		// The request is valid, the track was found.
 
-	// TESTING
-	testTrack := trackSlice[1]
-	switch field {
-	case "H_date":
-		//w.Write([]byte(testTrack.H_date))
-	case "pilot":
-		w.Write([]byte(testTrack.Pilot))
-	case "glider":
-		w.Write([]byte(testTrack.Glider))
-	case "glider_id":
-		w.Write([]byte(testTrack.Glider_id))
-	case "track_length":
-		//w.Write([]byte(testTrack.Track_length))
-	default:
+		// Retrieves the field specified, or 404 field not found.
+		output := ""
+		switch field {
+		case "H_date":
+			// Converts time.Time to string with string() method.
+			output = rTrack.H_date.String()
+		case "pilot":
+			output = rTrack.Pilot
+		case "glider":
+			output = rTrack.Glider
+		case "glider_id":
+			output = rTrack.Glider_id
+		case "track_length":
+			// Converts float64 to string.
+			output = strconv.FormatFloat(rTrack.Track_length, 'f', 6, 64)
+		default:
+			// If the field specified does not match any field in the track.
+			// Sets the header code to 404 (Not found).
+			w.WriteHeader(http.StatusNotFound)
+			output = ""
+		}
+
+		// Sets header content-type to text/plain.
+		w.Header().Set("Content-Type", "text/plain")
+
+		// Returns the field.
+		w.Write([]byte(output))
+
+	} else {
+		// A track with the given ID does not excist.
+		// Sets the header code to 404 (Not found).
 		w.WriteHeader(http.StatusNotFound)
 	}
 }
@@ -299,10 +309,10 @@ func main() {
 	router := mux.NewRouter()
 
 	// Functions to handle the URL paths.
-	router.HandleFunc("/igcinfo/api", getApiInfo)                                          // Done
-	router.HandleFunc("/igcinfo/api/igc", handleTracks)                                    // Done
-	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}", getTrackByID)                        // Done
-	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}/{field:[a-z-A-Z]+}", getDetailedTrack) //
+	router.HandleFunc("/igcinfo/api", getApiInfo)
+	router.HandleFunc("/igcinfo/api/igc", handleTracks)
+	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}", getTrackByID)
+	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack)
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")
