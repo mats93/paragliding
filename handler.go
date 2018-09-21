@@ -46,9 +46,8 @@ func getApiInfo(w http.ResponseWriter, r *http.Request) {
 // POST, GET: Track registration.
 // Input/Output: application/json
 func handleTracks(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-
 	// Calls functions to handle the GET and POST requests.
+	switch r.Method {
 	case "GET":
 		allTrackIDs(w, r)
 
@@ -58,7 +57,7 @@ func handleTracks(w http.ResponseWriter, r *http.Request) {
 	default:
 		// Sets header status code to 400 "Bad request", and writes out error.
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error: Must be a POST or GET request."))
+		w.Write([]byte("Error: Must be a POST or GET request.")) // ToDo: Skriv ut error på en annen måte.
 	}
 }
 
