@@ -162,55 +162,6 @@ func Test_handleTracks_GET_WithTracks(t *testing.T) {
 }
 
 // Function to test: handleTracks().
-// Test to check the returned status code, content-type and data for the function.
-func Test_handleTracks_POST(t *testing.T) {
-	// POST data.
-	postString := "{\"url\":\"http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc\"}"
-
-	// Creates a POST request that is passed to the handler.
-	request, _ := http.NewRequest("POST", "/igcinfo/api/igc", strings.NewReader(postString))
-
-	// Creates the recorder and router.
-	recorder := httptest.NewRecorder()
-	router := mux.NewRouter()
-
-	// Tests the function.
-	router.HandleFunc("/igcinfo/api/igc", handleTracks).Methods("POST")
-	router.ServeHTTP(recorder, request)
-
-	// Check the status code is what we expect (200).
-	status := recorder.Code
-	if status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
-
-	// Check if the content-type is what we expect (application/json).
-	content := recorder.HeaderMap.Get("content-type")
-	if content != "application/json" {
-		t.Errorf("Handler returned wrong content-type: got %s want %s",
-			content, "application/json")
-	}
-
-	// Check the response body is what we expect.
-	expectedReturn := "{\"id\": 1}"
-	actualReturn := recorder.Body.String()
-
-	if actualReturn != expectedReturn {
-		t.Errorf("Handler returned wrong data: got %v want %v",
-			actualReturn, expectedReturn)
-	}
-
-	// Check if the track was added to the slice.
-	if trackSlice != nil && trackSlice[0].Id != 1 {
-		t.Error("The track was not added in the trackSlice")
-	}
-
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
-}
-
-// Function to test: handleTracks().
 // Test to check the returned status code, content-type and data when the POST request has wrong json format.
 func Test_handleTracks_POST_MalformedPost(t *testing.T) {
 
@@ -277,10 +228,122 @@ func Test_handleTracks_POST_WrongFile(t *testing.T) {
 	}
 }
 
+// Function to test: handleTracks().
+// Test to check the returned status code, content-type and data for the function.
+func Test_handleTracks_POST(t *testing.T) {
+	// POST data.
+	postString := "{\"url\":\"http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc\"}"
+
+	// Creates a POST request that is passed to the handler.
+	request, _ := http.NewRequest("POST", "/igcinfo/api/igc", strings.NewReader(postString))
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/igcinfo/api/igc", handleTracks).Methods("POST")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (200).
+	status := recorder.Code
+	if status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check if the content-type is what we expect (application/json).
+	content := recorder.HeaderMap.Get("content-type")
+	if content != "application/json" {
+		t.Errorf("Handler returned wrong content-type: got %s want %s",
+			content, "application/json")
+	}
+
+	// Check the response body is what we expect.
+	expectedReturn := "{\"id\": 1}"
+	actualReturn := recorder.Body.String()
+
+	if actualReturn != expectedReturn {
+		t.Errorf("Handler returned wrong data: got %v want %v",
+			actualReturn, expectedReturn)
+	}
+
+	// Check if the track was added to the slice.
+	if trackSlice != nil && trackSlice[0].Id != 1 {
+		t.Error("The track was not added in the trackSlice")
+	}
+
+	// Sets the trackSlice to nil (empty).
+	trackSlice = nil
+}
+
+// Function to test: getTrackByID().
+// Test to check the returned status code, content-type and data when the requested track does not exist.
+func Test_getTrackByID_NoTrackExists(t *testing.T) {
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/igcinfo/api/igc/1", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/igcinfo/api/igc/1", getTrackByID).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (404).
+	status := recorder.Code
+	if status != http.StatusNotFound {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusNotFound)
+	}
+}
+
 // Function to test: getTrackByID().
 // Test to check the returned status code, content-type and data for the function.
 func Test_getTrackByID(t *testing.T) {
 
+	// Adding test data to compare with, and adds it to the slice.
+	trackTest := track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21}
+	trackSlice = append(trackSlice, trackTest)
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/igcinfo/api/igc/1", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/igcinfo/api/igc/1", getTrackByID).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (200).
+	status := recorder.Code
+	if status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check if the content-type is what we expect (application/json).
+	content := recorder.HeaderMap.Get("content-type")
+	if content != "application/json" {
+		t.Errorf("Handler returned wrong content-type: got %s want %s",
+			content, "application/json")
+	}
+
+	// Check the response body is what we expect.
+	expected, _ := json.Marshal(trackTest)
+	actual := recorder.Body.String()
+
+	if actual != string(expected) {
+		t.Errorf("Handler returned wrong data: got \"%v\" want \"%v\"",
+			actual, string(expected))
+	}
+
+	// Sets the trackSlice to nil (empty).
+	trackSlice = nil
 }
 
 // Function to test: getDetailedTrack().
