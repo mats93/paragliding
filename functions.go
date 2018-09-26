@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -47,8 +48,9 @@ func getApiInfo(w http.ResponseWriter, r *http.Request) {
 	// Converts the struct to json.
 	json, err := json.Marshal(currentAPI)
 	if err != nil {
-		// Sets header status code to 500 "Internal server error".
+		// Sets header status code to 500 "Internal server error" and logs the error.
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Panic(err)
 	} else {
 		// Sets header content-type to application/json and status code to 200 (OK).
 		w.Header().Set("Content-Type", "application/json")
@@ -62,29 +64,45 @@ func getApiInfo(w http.ResponseWriter, r *http.Request) {
 // GET: Returns an array of al track IDs.
 // Output: application/json.
 func allTrackIDs(w http.ResponseWriter, r *http.Request) {
-	// Converts the IDs to a "json list".
-	// Loops through all IDs and formats them.
-	// ToDo -> Encode to json properly.
-	message := "["
-	for i := 0; i < len(trackSlice); i++ {
-		// Converts int to string.
-		message += strconv.Itoa(trackSlice[i].Id)
-		if i != len(trackSlice)-1 {
-			message += ", "
+	// Check if there are tracks stored in memory.
+	if trackSlice != nil {
+		// There are tracks stored in the trackSlice.
+
+		// Slice of ints, to hold the IDs.
+		var idSlice []int
+
+		// Loops through the trackSlice, and adds the Ids to the new slice.
+		for i := 0; i < len(trackSlice); i++ {
+			idSlice = append(idSlice, trackSlice[i].Id)
 		}
+
+		// Converts the struct to json.
+		json, err := json.Marshal(idSlice)
+		if err != nil {
+			// Sets header status code to 500 "Internal server error" and logs the error.
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Panic(err)
+		} else {
+			// Sets header content-type to application/json and status code to 200 (OK).
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			// Returns the array of IDs.
+			w.Write([]byte(json))
+		}
+	} else {
+		// There are no tracks stored in the trackSlice.
+		// Sets header content-type to application/json and status code to 404 (Not found).
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+
+		// Returns an empty array.
+		w.Write([]byte("[]"))
 	}
-	// The end for the "json list".
-	message += "]"
 
-	// Sets header content-type to application/json and status code to 200 (OK).
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	// Outputs the list (empty or full).
-	w.Write([]byte(string(message)))
 }
 
-// POST: Takes the post request as json format and inserts a new track to the "DB".
+// POST: Takes the post request as json format and inserts a new track to the trackSlice.
 // Input/Output: application/json
 func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 	var newUrl url
@@ -93,25 +111,25 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&newUrl)
 
-	// If the decoding fails:
 	if err != nil {
+		// The decoding failed.
 		// Sets header status code to 400 "Bad request", and returns error message.
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Error: Malformed POST request, should be '{\"url\": \"<url>\"}'"))
 
-		// If the json decoding works:
 	} else {
-		// Adds the new track from the URL.
+		// The decoding was sucessful.
+		// Adds the new track fr provided by the POST request.
 		trackFile, err := igc.ParseLocation(newUrl.Url)
 
-		// If the igc parser fails:
 		if err != nil {
+			// The igc parser failed.
 			// Sets header status code to 400 "Bad request", and returns error message.
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Error: Bad url, could not parse the IGC data"))
 
-			// If the parser gets the IGC content:
 		} else {
+			// The igc parser worked.
 			// Calculates the total distance for the track.
 			var sum float64
 			// Loops through all Points[] in the track.
@@ -123,21 +141,26 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 			// Increments the global ID, to be used for an internal track ID.
 			lastUsedID++
 
-			// Adds the new track to a slice (memory-DB).
+			// Adds the new track to the trackSlice.
 			trackSlice = append(trackSlice,
 				track{lastUsedID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
 					trackFile.GliderID, sum})
 
-			// Converts the id to json format.
-			// ToDo -> Encode to json properly.
-			jsonID := fmt.Sprintf("{\"id\": %d}", lastUsedID)
+			// Converts the id to json format by using the id struct and Marshaling the struct to json.
+			idStruct := id{lastUsedID}
+			json, err := json.Marshal(idStruct)
+			if err != nil {
+				// Sets header status code to 500 "Internal server error" and logs the error.
+				w.WriteHeader(http.StatusInternalServerError)
+				log.Panic(err)
+			} else {
+				// Sets header content-type to application/json and status code to 200 (OK).
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
 
-			// Sets header content-type to application/json and status code to 200 (OK).
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-
-			// Returns the given tracks ID as json.
-			w.Write([]byte(jsonID))
+				// Returns the given tracks ID as json.
+				w.Write([]byte(json))
+			}
 		}
 	}
 }
@@ -170,8 +193,9 @@ func getTrackByID(w http.ResponseWriter, r *http.Request) {
 		// Converts the struct to json and outputs it.
 		json, err := json.Marshal(rTrack)
 		if err != nil {
-			// Sets header status code to 500 "Internal server error".
+			// Sets header status code to 500 "Internal server error" and logs the error.
 			w.WriteHeader(http.StatusInternalServerError)
+			log.Panic(err)
 		} else {
 			// Sets header content-type to application/json and status code to 200 (OK).
 			w.Header().Set("Content-Type", "application/json")

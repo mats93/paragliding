@@ -6,10 +6,8 @@
 	  RESTful json API.
 	  Assignment 1: in-memory IGC track viewer - IMT2681-2018 (Cloud Technologies)
 
-	  API to allow users to browse information about IGC files.
-	  The program wil not store anything in any persistant storage,
-	  instead it wil store submitted tracks in memory.
-
+	  API to allow users to browse and store information about IGC files.
+	  The program wil not store anything in persistant storage, only in memory.
 	  This app wil run in Heroku.
 
 	  By Mats Ove Mandt Skjærstein.
@@ -27,7 +25,7 @@ import (
 
 func main() {
 
-	// Uses mux for regex.
+	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
 
 	// Functions to handle the URL paths.

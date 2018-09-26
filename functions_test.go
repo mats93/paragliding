@@ -104,11 +104,11 @@ func Test_handleTracks_GET_NoTracks(t *testing.T) {
 	router.HandleFunc("/igcinfo/api/igc", handleTracks).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
-	// Check the status code is what we expect (200).
+	// Check the status code is what we expect (404).
 	status := recorder.Code
-	if status != http.StatusOK {
+	if status != http.StatusNotFound {
 		t.Errorf("Handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			status, http.StatusNotFound)
 	}
 
 	// Check if the content-type is what we expect (application/json).
@@ -149,7 +149,7 @@ func Test_handleTracks_GET_WithTracks(t *testing.T) {
 	router.ServeHTTP(recorder, request)
 
 	// Check the response body is what we expect, when 3 elements are in memory.
-	expected := "[1, 2, 3]"
+	expected := "[1,2,3]"
 	actual := recorder.Body.String()
 
 	if actual != expected {
@@ -260,7 +260,7 @@ func Test_handleTracks_POST(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	expectedReturn := "{\"id\": 1}"
+	expectedReturn := "{\"id\":1}"
 	actualReturn := recorder.Body.String()
 
 	if actualReturn != expectedReturn {

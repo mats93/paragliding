@@ -33,7 +33,12 @@ type url struct {
 	Url string `json:"url"`
 }
 
-// Slice with structs of type "track" (in-memory DB).
+// Format for the id to be returned when a new track is posted.
+type id struct {
+	Id int `json:"id"`
+}
+
+// Slice with structs of type "track" (in-memory storage).
 var trackSlice []track
 
 // Generates an unique ID for all tracks.
