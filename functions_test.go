@@ -347,7 +347,98 @@ func Test_getTrackByID(t *testing.T) {
 }
 
 // Function to test: getDetailedTrack().
-// Test to check the returned status code, content-type and data for the function.
+// Test to check the returned status code, content-type when the requested ID does not exist.
+func Test_getDetailedTrack_WrongID(t *testing.T) {
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/igcinfo/api/igc/10/pilot", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/igcinfo/api/igc/10/pilot", getDetailedTrack).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (404).
+	status := recorder.Code
+	if status != http.StatusNotFound {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusNotFound)
+	}
+}
+
+// Function to test: getDetailedTrack().
+// Test to check the returned status code, content-type when a non existent field is passed.
+func Test_getDetailedTrack_WrongField(t *testing.T) {
+
+	// Adding test data.
+	trackSlice = append(trackSlice, track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21})
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/igcinfo/api/igc/1/feil", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/igcinfo/api/igc/1/feil", getDetailedTrack).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (200).
+	status := recorder.Code
+	if status != http.StatusNotFound {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusNotFound)
+	}
+
+	// Sets the trackSlice to nil (empty).
+	trackSlice = nil
+}
+
+// Function to test: getDetailedTrack().
+// Test to check the returned status code, content-type and the data for the function.
 func Test_getDetailedTrack(t *testing.T) {
 
+	// Adding test data to compare with, and adds it to the slice.
+	expectedPilot := "pilot1"
+	trackSlice = append(trackSlice, track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21})
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/igcinfo/api/igc/1/pilot", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/igcinfo/api/igc/1/pilot", getDetailedTrack).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (200).
+	status := recorder.Code
+	if status != http.StatusOK {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check if the content-type is what we expect (text/plain).
+	content := recorder.HeaderMap.Get("content-type")
+	if content != "text/plain" {
+		t.Errorf("Handler returned wrong content-type: got %s want %s",
+			content, "text/plain")
+	}
+
+	// Check the response body is what we expect.
+	actual := recorder.Body.String()
+
+	if actual != expectedPilot {
+		t.Errorf("Handler returned wrong data: got %v want %v",
+			actual, expectedPilot)
+	}
+
+	// Sets the trackSlice to nil (empty).
+	trackSlice = nil
 }

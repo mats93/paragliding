@@ -13,11 +13,6 @@
 	  This app wil run in Heroku.
 
 	  By Mats Ove Mandt Skjærstein.
-
-  ToDo:
-	  Ha med error output med http.Error().
-	  Endre id liste og id til json, ikke bruk "selvlagd" json formatering.
-	  Skriv unit tester.
 */
 
 package main
@@ -44,12 +39,12 @@ func main() {
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")
 	if port == "" {
-	  // If there was no port, sets it to 8080.
-	  port = "8080"
+		// If there was no port, sets it to 8080.
+		port = "8080"
 	}
 
 	// Starts the web-application.
 	if err := http.ListenAndServe(":"+port, router); err != nil {
-	  log.Panic(err)
+		log.Panic(err)
 	}
 }
