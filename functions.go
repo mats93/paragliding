@@ -50,7 +50,7 @@ func getApiInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// Sets header status code to 500 "Internal server error" and logs the error.
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Panic(err)
+		log.Fatal(err)
 	} else {
 		// Sets header content-type to application/json and status code to 200 (OK).
 		w.Header().Set("Content-Type", "application/json")
@@ -81,7 +81,7 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// Sets header status code to 500 "Internal server error" and logs the error.
 			w.WriteHeader(http.StatusInternalServerError)
-			log.Panic(err)
+			log.Fatal(err)
 		} else {
 			// Sets header content-type to application/json and status code to 200 (OK).
 			w.Header().Set("Content-Type", "application/json")
@@ -152,7 +152,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				// Sets header status code to 500 "Internal server error" and logs the error.
 				w.WriteHeader(http.StatusInternalServerError)
-				log.Panic(err)
+				log.Fatal(err)
 			} else {
 				// Sets header content-type to application/json and status code to 200 (OK).
 				w.Header().Set("Content-Type", "application/json")
@@ -195,7 +195,7 @@ func getTrackByID(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// Sets header status code to 500 "Internal server error" and logs the error.
 			w.WriteHeader(http.StatusInternalServerError)
-			log.Panic(err)
+			log.Fatal(err)
 		} else {
 			// Sets header content-type to application/json and status code to 200 (OK).
 			w.Header().Set("Content-Type", "application/json")

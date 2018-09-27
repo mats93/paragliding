@@ -43,6 +43,6 @@ func main() {
 
 	// Starts the web-application.
 	if err := http.ListenAndServe(":"+port, router); err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 }
