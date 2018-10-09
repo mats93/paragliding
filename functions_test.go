@@ -16,12 +16,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Function to test: retriveTrackById().
+// Function to test: retriveTrackByID().
 // Test if the correct ID is returned.
-func Test_retriveTrackById(t *testing.T) {
+func Test_retriveTrackByID(t *testing.T) {
 
 	// Check if it returns an error if the trackSlice is emtpy.
-	if _, err := retriveTrackById(10); err == nil {
+	if _, err := retriveTrackByID(10); err == nil {
 		t.Error("Function did not return error when track array was empty")
 	}
 
@@ -30,24 +30,24 @@ func Test_retriveTrackById(t *testing.T) {
 		track{10, time.Now(), "pilot", "glider", "glider_id", 20.4})
 
 	// Check if it returns an error if the track was not found.
-	if _, err := retriveTrackById(1); err == nil {
+	if _, err := retriveTrackByID(1); err == nil {
 		t.Error("Function did not return error when requestet ID did not exist")
 	}
 
 	// Check if the correct track with the specified ID is sent back.
-	newTrack, _ := retriveTrackById(10)
-	if newTrack.Id != 10 {
+	newTrack, _ := retriveTrackByID(10)
+	if newTrack.ID != 10 {
 		t.Errorf("Function did not return the correct track: got %d want %d",
-			newTrack.Id, 10)
+			newTrack.ID, 10)
 	}
 
 	// Sets the trackSlice to nil (empty).
 	trackSlice = nil
 }
 
-// Function to test: getApiInfo().
+// Function to test: getAPIInfo().
 // Test to check the returned status code, content-type and data for the function.
-func Test_getApiInfo(t *testing.T) {
+func Test_getAPIInfo(t *testing.T) {
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/igcinfo/api", nil)
@@ -57,7 +57,7 @@ func Test_getApiInfo(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/igcinfo/api", getApiInfo).Methods("GET")
+	router.HandleFunc("/igcinfo/api", getAPIInfo).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -269,7 +269,7 @@ func Test_handleTracks_POST(t *testing.T) {
 	}
 
 	// Check if the track was added to the slice.
-	if trackSlice != nil && trackSlice[0].Id != 1 {
+	if trackSlice != nil && trackSlice[0].ID != 1 {
 		t.Error("The track was not added in the trackSlice")
 	}
 

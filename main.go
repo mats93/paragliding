@@ -29,7 +29,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// Functions to handle the URL paths.
-	router.HandleFunc("/igcinfo/api", getApiInfo)
+	router.HandleFunc("/igcinfo/api", getAPIInfo)
 	router.HandleFunc("/igcinfo/api/igc", handleTracks)
 	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}", getTrackByID)
 	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack)

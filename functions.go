@@ -19,11 +19,11 @@ import (
 )
 
 // Searches for a given track with an ID.
-func retriveTrackById(id int) (track, error) {
+func retriveTrackByID(id int) (track, error) {
 	// Loops through all tracks.
 	for _, tr := range trackSlice {
 		// If a track with the same ID as the parameter is found, return the track and no error.
-		if tr.Id == id {
+		if tr.ID == id {
 			return tr, nil
 		}
 	}
@@ -34,7 +34,7 @@ func retriveTrackById(id int) (track, error) {
 
 // GET: Returns information about the API.
 // Output: application/json
-func getApiInfo(w http.ResponseWriter, r *http.Request) {
+func getAPIInfo(w http.ResponseWriter, r *http.Request) {
 	// Calculates the duration since application start.
 	// Uses the ISO 8601 Duration format.
 	// The Date package "github.com/rickb777/date/period" is used for this.
@@ -45,7 +45,7 @@ func getApiInfo(w http.ResponseWriter, r *http.Request) {
 	// Creates a new struct for the API info.
 	currentAPI := apiInfo{timeStr, INFORMATION, VERSION}
 
-	// Converts the struct to json.
+	// Converts the strugetAPIInfo.
 	json, err := json.Marshal(currentAPI)
 	if err != nil {
 		// Sets header status code to 500 "Internal server error" and logs the error.
@@ -73,7 +73,7 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 
 		// Loops through the trackSlice, and adds the Ids to the new slice.
 		for i := 0; i < len(trackSlice); i++ {
-			idSlice = append(idSlice, trackSlice[i].Id)
+			idSlice = append(idSlice, trackSlice[i].ID)
 		}
 
 		// Converts the struct to json.
@@ -105,11 +105,11 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 // POST: Takes the post request as json format and inserts a new track to the trackSlice.
 // Input/Output: application/json
 func insertNewTrack(w http.ResponseWriter, r *http.Request) {
-	var newUrl url
+	var newURL url
 
 	// Decodes the json url and converts it to a struct.
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&newUrl)
+	err := decoder.Decode(&newURL)
 
 	if err != nil {
 		// The decoding failed.
@@ -120,7 +120,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// The decoding was sucessful.
 		// Adds the new track fr provided by the POST request.
-		trackFile, err := igc.ParseLocation(newUrl.Url)
+		trackFile, err := igc.ParseLocation(newURL.URL)
 
 		if err != nil {
 			// The igc parser failed.
@@ -187,7 +187,7 @@ func getTrackByID(w http.ResponseWriter, r *http.Request) {
 
 	// Tries to retrive the track with the requestet ID.
 	// Retrieves the ID from the url.
-	if rTrack, err := retriveTrackById(id); err == nil {
+	if rTrack, err := retriveTrackByID(id); err == nil {
 		// The request is valid, the track was found.
 
 		// Converts the struct to json and outputs it.
@@ -222,7 +222,7 @@ func getDetailedTrack(w http.ResponseWriter, r *http.Request) {
 
 	// Tries to retrive the track with the requestet ID.
 	// Retrieves the ID from the url.
-	if rTrack, err := retriveTrackById(id); err == nil {
+	if rTrack, err := retriveTrackByID(id); err == nil {
 		// The request is valid, the track was found.
 
 		// Retrieves the field specified, or 404 field not found.
@@ -230,16 +230,16 @@ func getDetailedTrack(w http.ResponseWriter, r *http.Request) {
 		switch field {
 		case "H_date":
 			// Converts time.Time to string with string() method.
-			output = rTrack.H_date.String()
+			output = rTrack.HDate.String()
 		case "pilot":
 			output = rTrack.Pilot
 		case "glider":
 			output = rTrack.Glider
 		case "glider_id":
-			output = rTrack.Glider_id
+			output = rTrack.GliderID
 		case "track_length":
 			// Converts float64 to string.
-			output = strconv.FormatFloat(rTrack.Track_length, 'f', 6, 64)
+			output = strconv.FormatFloat(rTrack.TrackLength, 'f', 6, 64)
 		default:
 			// If the field specified does not match any field in the track.
 			// Sets the header code to 404 (Not found).
