@@ -46,19 +46,19 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200 if everything is OK, appropriate error code otherwise, eg. when provided body content, is malformed or URL does not point to a proper IGC file, etc. Handle all errors gracefully.
 *   Request body template
 
+```javascript
     {
-      
-	"url": "<url>"
-    
+      "url": "<url>"
     }
+```
 
 *   Response body template
 
+```javascript
     {
-
-	"id": "<id>"
-
+      "id": "<id>"
     }
+```
 
 *   where: `<url>` represents a normal URL, that would work in a browser, eg: `http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc` and `<id>` represents an ID of the track, according to your internal management system. You can choose what format should be in your system. The only restriction is that it needs to be easily used in URLs and it must be unique. It is used in subsequent API calls to uniquely identify a track, see below.
 
@@ -69,11 +69,11 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200 if everything is OK, appropriate error code otherwise.
 *   Response: the array of IDs, or an empty array if no tracks have been stored yet.
 
+```javascript
     [
-
-	\<id1\>, \<id2\>, ...
-
+      <id1>, <id2>, ...
     ]
+```
 
 ### [](#get-apiigcid)GET /api/igc/`<id>`
 
@@ -82,23 +82,15 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200 if everything is OK, appropriate error code otherwise.
 *   Response:
 
+```javascript
     {
-
-    	"H_date": <date from File Header, H-record>,
-
-
-    	"pilot": <pilot>,
-
-
-    	"glider": <glider>,
-
-
-    	"glider_id": <glider_id>,
-
-
-    	"track_length": <calculated total track length>
-
+      "H_date": <date from File Header, H-record>,
+      "pilot": <pilot>,
+      "glider": <glider>,
+      "glider_id": <glider_id>,
+      "track_length": <calculated total track length>
     }
+```
 
 ### [](#get-apiigcidfield)GET /api/igc/`<id>`/`<field>`
 
