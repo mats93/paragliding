@@ -1,7 +1,7 @@
 # In-memory IGC track viewer
 Assignment 1 in the course IMT2681-2018 (Cloud Technologies) at NTNU Gjøvik.
 
-This application is a RESTful API to upload and browse IGC files.
+This application is a RESTful API to upload and browse [IGC files.](https://www.fai.org/sites/default/files/documents/igc_fr_spec_with_al4a_2016-4-10.pdf)
 
 ## API calls: 
  * `GET:  /igcinfo/api`                  - Returns information about the API.
