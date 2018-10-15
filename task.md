@@ -63,7 +63,7 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200 if everything is OK, appropriate error code otherwise.
 *   Response: the array of IDs, or an empty array if no tracks have been stored yet.
 
-    [<id1>, <id2>, ...]
+    [\<id1\>, \<id2\>, ...]
 
 ### [](#get-apiigcid)GET /api/igc/`<id>`
 
@@ -73,11 +73,21 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response:
 
     {
+
     "H_date": <date from File Header, H-record>,
+
+
     "pilot": <pilot>,
+
+
     "glider": <glider>,
+
+
     "glider_id": <glider_id>,
+
+
     "track_length": <calculated total track length>
+
     }
 
 ### [](#get-apiigcidfield)GET /api/igc/`<id>`/`<field>`
@@ -96,13 +106,3 @@ The server should respond with 404 when asked about the root. The API should be 
 
 *   [Go IGC library](https://github.com/marni/goigc)
 
-## [](#formal-aspects)Formal aspects
-
-This assignment is worth 10% of 100% for the course. Note, the internal portfolio is worth 40%, thus this assignment is worth 25% of the internal portfolio.
-
-# [](#submission)Submission
-
-The submission deadline is **Sunday, October 14th, 23:59**. No extensions will be given for late submissions.
-
-**[Please use this form for your submission](https://goo.gl/forms/kz90umHAJd6Bru1W2)**  
-Note - in case of repeated submissions we take only the last one into account.
