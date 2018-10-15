@@ -29,15 +29,13 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200
 *   Body template
 
+```json
     {
-      
-	"uptime": <uptime>
-      
-	"info": "Service for IGC tracks."
-      
-	"version": "v1"
-
+      "uptime": <uptime>
+      "info": "Service for IGC tracks."
+      "version": "v1"
     }
+```
 
 *   where: `<uptime>` is the current uptime of the service formatted according to [Duration format as specified by ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations).
 
