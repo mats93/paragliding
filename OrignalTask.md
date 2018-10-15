@@ -69,11 +69,7 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200 if everything is OK, appropriate error code otherwise.
 *   Response: the array of IDs, or an empty array if no tracks have been stored yet.
 
-```javascript
-    [
-      <id1>, <id2>, ...
-    ]
-```
+    [ \<id1\>, \<id2\>, ... ]
 
 ### [](#get-apiigcid)GET /api/igc/`<id>`
 

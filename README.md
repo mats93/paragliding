@@ -18,3 +18,6 @@ The app does not store data in any persistant storage, only in memory.
 
 Created by Mats
 
+
+[Task details](https://github.com/mats93/igcinfo/blob/master/OrignalTask.md)
+
