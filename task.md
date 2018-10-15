@@ -29,7 +29,7 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200
 *   Body template
 
-```json
+```javascript
     {
       "uptime": <uptime>
       "info": "Service for IGC tracks."
