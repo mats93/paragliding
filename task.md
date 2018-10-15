@@ -30,9 +30,13 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Body template
 
     {
-      "uptime": <uptime>
-      "info": "Service for IGC tracks."
-      "version": "v1"
+      
+	"uptime": <uptime>
+      
+	"info": "Service for IGC tracks."
+      
+	"version": "v1"
+
     }
 
 *   where: `<uptime>` is the current uptime of the service formatted according to [Duration format as specified by ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations).
@@ -45,13 +49,17 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Request body template
 
     {
-      "url": "<url>"
+      
+	"url": "<url>"
+    
     }
 
 *   Response body template
 
     {
-      "id": "<id>"
+
+	"id": "<id>"
+
     }
 
 *   where: `<url>` represents a normal URL, that would work in a browser, eg: `http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc` and `<id>` represents an ID of the track, according to your internal management system. You can choose what format should be in your system. The only restriction is that it needs to be easily used in URLs and it must be unique. It is used in subsequent API calls to uniquely identify a track, see below.
@@ -63,7 +71,11 @@ The server should respond with 404 when asked about the root. The API should be 
 *   Response code: 200 if everything is OK, appropriate error code otherwise.
 *   Response: the array of IDs, or an empty array if no tracks have been stored yet.
 
-    [\<id1\>, \<id2\>, ...]
+    [
+
+	\<id1\>, \<id2\>, ...
+
+    ]
 
 ### [](#get-apiigcid)GET /api/igc/`<id>`
 
@@ -74,19 +86,19 @@ The server should respond with 404 when asked about the root. The API should be 
 
     {
 
-    "H_date": <date from File Header, H-record>,
+    	"H_date": <date from File Header, H-record>,
 
 
-    "pilot": <pilot>,
+    	"pilot": <pilot>,
 
 
-    "glider": <glider>,
+    	"glider": <glider>,
 
 
-    "glider_id": <glider_id>,
+    	"glider_id": <glider_id>,
 
 
-    "track_length": <calculated total track length>
+    	"track_length": <calculated total track length>
 
     }
 
