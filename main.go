@@ -26,11 +26,11 @@ func main() {
 
 	// Functions to handle the URL paths.
 	// Track:
-	router.HandleFunc("/paragliding/", redirectToInfo)
-	router.HandleFunc("/paragliding/api", getAPIInfo)
-	router.HandleFunc("/paragliding/api/track", handleTracks)
-	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}", getTrackByID)
-	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack)
+	router.HandleFunc("/paragliding/", redirectToInfo)                                             // Done
+	router.HandleFunc("/paragliding/api", getAPIInfo)                                              // Done
+	router.HandleFunc("/paragliding/api/track", handleTracks)                                      // Post: Legg til Track src url.
+	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}", getTrackByID)                          // Ha med output av Track src url.
+	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack) // Ha med output av Track src url
 
 	// Ticker:
 

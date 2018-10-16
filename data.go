@@ -8,7 +8,7 @@ package main
 import "time"
 
 // INFORMATION = The API inforomation text.
-const INFORMATION = "Service for IGC tracks"
+const INFORMATION = "Service for Paragliding tracks"
 
 // VERSION = The API version that is currently running.
 const VERSION = "v1"
@@ -21,6 +21,7 @@ type track struct {
 	Glider      string    `json:"glider"`
 	GliderID    string    `json:"glider_id"`
 	TrackLength float64   `json:"track_length"`
+	TrackSrcURL string    `json:"track_src_url"`
 }
 
 // Format for the API information.

@@ -149,7 +149,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 			// Adds the new track to the trackSlice.
 			trackSlice = append(trackSlice,
 				track{lastUsedID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
-					trackFile.GliderID, sum})
+					trackFile.GliderID, sum, newURL.URL})
 
 			// Converts the id to json format by using the id struct and Marshaling the struct to json.
 			idStruct := id{lastUsedID}
@@ -245,6 +245,8 @@ func getDetailedTrack(w http.ResponseWriter, r *http.Request) {
 		case "track_length":
 			// Converts float64 to string.
 			output = strconv.FormatFloat(rTrack.TrackLength, 'f', 6, 64)
+		case "track_src_url":
+			output = rTrack.TrackSrcURL
 		default:
 			// If the field specified does not match any field in the track.
 			// Sets the header code to 404 (Not found).

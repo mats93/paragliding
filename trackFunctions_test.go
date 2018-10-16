@@ -27,7 +27,7 @@ func Test_retriveTrackByID(t *testing.T) {
 
 	// Adds a track to the trackSlice with id 10.
 	trackSlice = append(trackSlice,
-		track{10, time.Now(), "pilot", "glider", "glider_id", 20.4})
+		track{10, time.Now(), "pilot", "glider", "glider_id", 20.4, "http://test.test"})
 
 	// Check if it returns an error if the track was not found.
 	if _, err := retriveTrackByID(1); err == nil {
@@ -133,9 +133,9 @@ func Test_handleTracks_GET_WithTracks(t *testing.T) {
 
 	// Adding test data to compare with
 	trackSlice = append(trackSlice,
-		track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21},
-		track{2, time.Now(), "pilot2", "glider2", "glider_id2", 22},
-		track{3, time.Now(), "pilot3", "glider3", "glider_id3", 23})
+		track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"},
+		track{2, time.Now(), "pilot2", "glider2", "glider_id2", 22, "http://test.test"},
+		track{3, time.Now(), "pilot3", "glider3", "glider_id3", 23, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track", nil)
@@ -305,7 +305,7 @@ func Test_getTrackByID_NoTrackExists(t *testing.T) {
 func Test_getTrackByID(t *testing.T) {
 
 	// Adding test data to compare with, and adds it to the slice.
-	trackTest := track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21}
+	trackTest := track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
 	trackSlice = append(trackSlice, trackTest)
 
 	// Creates a request that is passed to the handler.
@@ -374,7 +374,7 @@ func Test_getDetailedTrack_WrongID(t *testing.T) {
 func Test_getDetailedTrack_WrongField(t *testing.T) {
 
 	// Adding test data.
-	trackSlice = append(trackSlice, track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21})
+	trackSlice = append(trackSlice, track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/feil", nil)
@@ -404,7 +404,7 @@ func Test_getDetailedTrack(t *testing.T) {
 
 	// Adding test data to compare with, and adds it to the slice.
 	expectedPilot := "pilot1"
-	trackSlice = append(trackSlice, track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21})
+	trackSlice = append(trackSlice, track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/pilot", nil)
