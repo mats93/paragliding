@@ -12,18 +12,18 @@ This application is a RESTful API to upload and browse [IGC files.](https://www.
  * `GET:  /paragliding/api/track/<id>/<field>` - Returns single detailed metadata about a given tracks field with the provided '<id\>' and '<field\>'.
 
 ### Ticker:
- * `GET:  paragliding/api/ticker/latest`       - Returns the timestamp of the latest added track.
- * `GET:  paragliding/api/ticker/`             - Returns the JSON struct representing the ticker for the IGC tracks (array of max 5).
- * `GET:  paragliding/api/ticker/<timestamp>`  - Returns the JSON struct representing the ticker for the IGC tracks, returns only higher timestamps then the one provided.
+ * `GET:  /paragliding/api/ticker/latest`       - Returns the timestamp of the latest added track.
+ * `GET:  /paragliding/api/ticker/`             - Returns the JSON struct representing the ticker for the IGC tracks (array of max 5).
+ * `GET:  /paragliding/api/ticker/<timestamp>`  - Returns the JSON struct representing the ticker for the IGC tracks, returns only higher timestamps then the one provided.
 
 ### Webhooks:
- * `POST: paragliding/api/webhook/new_track/`  - Registration of new webhook for notifications about tracks being added to the system. Returns the details about the registration
- * `GET:  paragliding/api/webhook/new_track/<webhook_id>` - Accessing registered webhooks.
- * `DELETE: paragliding/api/webhook/new_track/<webhook_id>` - Deleting registered webhooks.
+ * `POST:   /paragliding/api/webhook/new_track/`  - Registration of new webhook for notifications about tracks being added to the system. Returns the details about the registration
+ * `GET:    /paragliding/api/webhook/new_track/<webhook_id>` - Accessing registered webhooks.
+ * `DELETE: /paragliding/api/webhook/new_track/<webhook_id>` - Deleting registered webhooks.
 
 ### Admin:
- * `GET:  paragliding/admin/api/tracks_count`  - Returns the current count of all tracks in the DB.
- * `DELETE: paragliding/admin/api/tracks`      - Deletes all tracks in the DB.
+ * `GET:    /paragliding/admin/api/tracks_count`  - Returns the current count of all tracks in the DB.
+ * `DELETE: /paragliding/admin/api/tracks`      - Deletes all tracks in the DB.
 
 
 ## Additional information:

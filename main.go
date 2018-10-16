@@ -25,10 +25,18 @@ func main() {
 	router := mux.NewRouter()
 
 	// Functions to handle the URL paths.
-	router.HandleFunc("/igcinfo/api", getAPIInfo)
-	router.HandleFunc("/igcinfo/api/igc", handleTracks)
-	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}", getTrackByID)
-	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack)
+	// Track:
+	router.HandleFunc("/paragliding/", redirectToInfo)
+	router.HandleFunc("/paragliding/api", getAPIInfo)
+	router.HandleFunc("/paragliding/api/track", handleTracks)
+	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}", getTrackByID)
+	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack)
+
+	// Ticker:
+
+	// Webhook:
+
+	// Admin:
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")

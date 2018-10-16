@@ -18,6 +18,11 @@ import (
 	"github.com/rickb777/date/period"
 )
 
+// Redirects to the function 'getAPIInfo'.
+func redirectToInfo(w http.ResponseWriter, r *http.Request) {
+	http.RedirectHandler("/paragliding/api", 301)
+}
+
 // Searches for a given track with an ID.
 func retriveTrackByID(id int) (track, error) {
 	// Loops through all tracks.
@@ -183,7 +188,7 @@ func handleTracks(w http.ResponseWriter, r *http.Request) {
 func getTrackByID(w http.ResponseWriter, r *http.Request) {
 	var id int
 	// Gets the ID from the URL and converts it to an integer.
-	fmt.Sscanf(r.URL.Path, "/igcinfo/api/igc/%d", &id)
+	fmt.Sscanf(r.URL.Path, "/paragliding/api/track/%d", &id)
 
 	// Tries to retrive the track with the requestet ID.
 	// Retrieves the ID from the url.
@@ -218,7 +223,7 @@ func getDetailedTrack(w http.ResponseWriter, r *http.Request) {
 	var field string
 
 	// Gets the field and ID from the URL, converts the ID to an integer.
-	fmt.Sscanf(r.URL.Path, "/igcinfo/api/igc/%d/%s", &id, &field)
+	fmt.Sscanf(r.URL.Path, "/paragliding/api/track/%d/%s", &id, &field)
 
 	// Tries to retrive the track with the requestet ID.
 	// Retrieves the ID from the url.
