@@ -1,6 +1,6 @@
 /*
-	File: functions.go
-  Contains functions used by the igcinfo program.
+	File: trackFunctions.go
+  Contains functions used by API calls to the "Track paths".
 */
 
 package main
@@ -18,9 +18,8 @@ import (
 	"github.com/rickb777/date/period"
 )
 
-// Redirects to the function 'getAPIInfo'.
+// Redirects to the /paragliding/api.
 func redirectToInfo(w http.ResponseWriter, r *http.Request) {
-	//http.RedirectHandler("/paragliding/api", 301)
 	http.Redirect(w, r, r.RequestURI+"/api", 301)
 }
 

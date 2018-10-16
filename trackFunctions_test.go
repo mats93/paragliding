@@ -1,6 +1,6 @@
 /*
-  File: functions_test.go
-  Contains unit tests for functions.go
+  File: trackFunctions_test.go
+  Contains unit tests for trackFunctions.go
 */
 
 package main
