@@ -1,1 +1,1 @@
-web: paragliding-api
+web: igcinfo
