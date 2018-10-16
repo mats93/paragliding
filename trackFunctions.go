@@ -20,7 +20,8 @@ import (
 
 // Redirects to the function 'getAPIInfo'.
 func redirectToInfo(w http.ResponseWriter, r *http.Request) {
-	http.RedirectHandler("/paragliding/api", 301)
+	//http.RedirectHandler("/paragliding/api", 301)
+	http.Redirect(w, r, r.RequestURI+"/api", 301)
 }
 
 // Searches for a given track with an ID.
