@@ -1,14 +1,10 @@
 /*
 	File: main.go
-	Contains the main program of the igc track API.
+	Contains the main program of the paraglider API.
 
   Information about the program:
-	  RESTful json API.
-	  Assignment 1: in-memory IGC track viewer - IMT2681-2018 (Cloud Technologies)
-
-	  API to allow users to browse and store information about IGC files.
-	  The program wil not store anything in persistant storage, only in memory.
-	  This app wil run in Heroku.
+		RESTful json API.
+		Assignment 2: IGC track viewer extended - IMT2681-2018 (Cloud Technologies)
 
 	  By Mats Ove Mandt Skjærstein.
 */
@@ -29,7 +25,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// Functions to handle the URL paths.
-	router.HandleFunc("/igcinfo/apii", getAPIInfo)
+	router.HandleFunc("/igcinfo/api", getAPIInfo)
 	router.HandleFunc("/igcinfo/api/igc", handleTracks)
 	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}", getTrackByID)
 	router.HandleFunc("/igcinfo/api/igc/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", getDetailedTrack)
