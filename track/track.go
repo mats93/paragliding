@@ -15,6 +15,7 @@ import (
 	"time"
 
 	igc "github.com/marni/goigc"
+	"github.com/mats93/paragliding/data"
 	"github.com/rickb777/date/period"
 )
 
