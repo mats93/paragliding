@@ -3,7 +3,7 @@
   Contains functions used by API calls to the "Track paths".
 */
 
-package track
+package main
 
 import (
 	"encoding/json"
