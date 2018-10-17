@@ -3,7 +3,7 @@
   Contains unit tests for trackFunctions.go
 */
 
-package main
+package track
 
 import (
 	"encoding/json"

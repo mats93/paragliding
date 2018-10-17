@@ -3,7 +3,7 @@
   Contains constant variables, structs and global variables for the API.
 */
 
-package main
+package data
 
 import "time"
 
