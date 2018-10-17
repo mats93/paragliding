@@ -1,0 +1,16 @@
+# github.com/golang/geo v0.0.0-20181008215305-476085157cff
+github.com/golang/geo/s2
+github.com/golang/geo/r1
+github.com/golang/geo/r2
+github.com/golang/geo/r3
+github.com/golang/geo/s1
+# github.com/gorilla/context v1.1.1
+github.com/gorilla/context
+# github.com/gorilla/mux v1.6.2
+github.com/gorilla/mux
+# github.com/marni/goigc v0.1.0
+github.com/marni/goigc
+# github.com/rickb777/date v1.7.2
+github.com/rickb777/date/period
+# github.com/rickb777/plural v1.2.0
+github.com/rickb777/plural

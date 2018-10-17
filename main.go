@@ -27,11 +27,11 @@ func main() {
 
 	// Functions to handle the URL paths.
 	// Track:
-	router.HandleFunc("/paragliding/", RedirectToInfo)
-	router.HandleFunc("/paragliding/api", GetAPIInfo)
-	router.HandleFunc("/paragliding/api/track", HandleTracks)
-	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}", GetTrackByID)
-	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", GetDetailedTrack)
+	router.HandleFunc("/paragliding/", track.RedirectToInfo)
+	router.HandleFunc("/paragliding/api", track.GetAPIInfo)
+	router.HandleFunc("/paragliding/api/track", track.HandleTracks)
+	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}", track.GetTrackByID)
+	router.HandleFunc("/paragliding/api/track/{id:[0-9]+}/{field:[a-z-A-Z-_]+}", track.GetDetailedTrack)
 
 	/* Ticker:
 	router.HandleFunc("/paragliding/api/ticker/latest", )
