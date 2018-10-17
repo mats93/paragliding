@@ -17,7 +17,6 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/mats93/paragliding/track"
 )
 
 func main() {
