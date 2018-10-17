@@ -3,7 +3,7 @@
   Contains unit tests for trackFunctions.go
 */
 
-package main
+package track
 
 import (
 	"encoding/json"
@@ -45,9 +45,9 @@ func Test_retriveTrackByID(t *testing.T) {
 	trackSlice = nil
 }
 
-// Function to test: getAPIInfo().
+// Function to test: GetAPIInfo().
 // Test to check the returned status code, content-type and data for the function.
-func Test_getAPIInfo(t *testing.T) {
+func Test_GetAPIInfo(t *testing.T) {
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api", nil)
@@ -57,7 +57,7 @@ func Test_getAPIInfo(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api", getAPIInfo).Methods("GET")
+	router.HandleFunc("/paragliding/api", GetAPIInfo).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -89,10 +89,10 @@ func Test_getAPIInfo(t *testing.T) {
 	}
 }
 
-// Function to test: handleTracks().
+// Function to test: HandleTracks().
 // Test to check the returned status code, content-type and data for the function.
 // Tests the GET request with zero tracks in memory.
-func Test_handleTracks_GET_NoTracks(t *testing.T) {
+func Test_HandleTracks_GET_NoTracks(t *testing.T) {
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track", nil)
 
@@ -101,7 +101,7 @@ func Test_handleTracks_GET_NoTracks(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track", handleTracks).Methods("GET")
+	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (404).
@@ -129,7 +129,7 @@ func Test_handleTracks_GET_NoTracks(t *testing.T) {
 }
 
 // Tests the GET request with 3 tracks in memory.
-func Test_handleTracks_GET_WithTracks(t *testing.T) {
+func Test_HandleTracks_GET_WithTracks(t *testing.T) {
 
 	// Adding test data to compare with
 	trackSlice = append(trackSlice,
@@ -145,7 +145,7 @@ func Test_handleTracks_GET_WithTracks(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track", handleTracks).Methods("GET")
+	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the response body is what we expect, when 3 elements are in memory.
@@ -161,9 +161,9 @@ func Test_handleTracks_GET_WithTracks(t *testing.T) {
 	trackSlice = nil
 }
 
-// Function to test: handleTracks().
+// Function to test: HandleTracks().
 // Test to check the returned status code, content-type and data when the POST request has wrong json format.
-func Test_handleTracks_POST_MalformedPost(t *testing.T) {
+func Test_HandleTracks_POST_MalformedPost(t *testing.T) {
 
 	// Creates a malformed (wrong json format) POST request that is passed to the handler.
 	request, _ := http.NewRequest("POST", "/paragliding/api/track", strings.NewReader("wrong"))
@@ -173,7 +173,7 @@ func Test_handleTracks_POST_MalformedPost(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track", handleTracks).Methods("POST")
+	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("POST")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (400).
@@ -193,9 +193,9 @@ func Test_handleTracks_POST_MalformedPost(t *testing.T) {
 	}
 }
 
-// Function to test: handleTracks().
+// Function to test: HandleTracks().
 // Test to check the returned status code, content-type and data when the POST request has wrong url, but correct json format.
-func Test_handleTracks_POST_WrongFile(t *testing.T) {
+func Test_HandleTracks_POST_WrongFile(t *testing.T) {
 
 	// POST data, correct json format, but it's not an igc file.
 	postString := "{\"url\":\"wrong\"}"
@@ -208,7 +208,7 @@ func Test_handleTracks_POST_WrongFile(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track", handleTracks).Methods("POST")
+	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("POST")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (400).
@@ -228,9 +228,9 @@ func Test_handleTracks_POST_WrongFile(t *testing.T) {
 	}
 }
 
-// Function to test: handleTracks().
+// Function to test: HandleTracks().
 // Test to check the returned status code, content-type and data for the function.
-func Test_handleTracks_POST(t *testing.T) {
+func Test_HandleTracks_POST(t *testing.T) {
 	// POST data.
 	postString := "{\"url\":\"http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc\"}"
 
@@ -242,7 +242,7 @@ func Test_handleTracks_POST(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track", handleTracks).Methods("POST")
+	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("POST")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -277,9 +277,9 @@ func Test_handleTracks_POST(t *testing.T) {
 	trackSlice = nil
 }
 
-// Function to test: getTrackByID().
+// Function to test: GetTrackByID().
 // Test to check the returned status code, content-type and data when the requested track does not exist.
-func Test_getTrackByID_NoTrackExists(t *testing.T) {
+func Test_GetTrackByID_NoTrackExists(t *testing.T) {
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1", nil)
@@ -289,7 +289,7 @@ func Test_getTrackByID_NoTrackExists(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track/1", getTrackByID).Methods("GET")
+	router.HandleFunc("/paragliding/api/track/1", GetTrackByID).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (404).
@@ -300,9 +300,9 @@ func Test_getTrackByID_NoTrackExists(t *testing.T) {
 	}
 }
 
-// Function to test: getTrackByID().
+// Function to test: GetTrackByID().
 // Test to check the returned status code, content-type and data for the function.
-func Test_getTrackByID(t *testing.T) {
+func Test_GetTrackByID(t *testing.T) {
 
 	// Adding test data to compare with, and adds it to the slice.
 	trackTest := track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
@@ -316,7 +316,7 @@ func Test_getTrackByID(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track/1", getTrackByID).Methods("GET")
+	router.HandleFunc("/paragliding/api/track/1", GetTrackByID).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -346,9 +346,9 @@ func Test_getTrackByID(t *testing.T) {
 	trackSlice = nil
 }
 
-// Function to test: getDetailedTrack().
+// Function to test: GetDetailedTrack().
 // Test to check the returned status code, content-type when the requested ID does not exist.
-func Test_getDetailedTrack_WrongID(t *testing.T) {
+func Test_GetDetailedTrack_WrongID(t *testing.T) {
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/10/pilot", nil)
@@ -358,7 +358,7 @@ func Test_getDetailedTrack_WrongID(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track/10/pilot", getDetailedTrack).Methods("GET")
+	router.HandleFunc("/paragliding/api/track/10/pilot", GetDetailedTrack).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (404).
@@ -369,9 +369,9 @@ func Test_getDetailedTrack_WrongID(t *testing.T) {
 	}
 }
 
-// Function to test: getDetailedTrack().
+// Function to test: GetDetailedTrack().
 // Test to check the returned status code, content-type when a non existent field is passed.
-func Test_getDetailedTrack_WrongField(t *testing.T) {
+func Test_GetDetailedTrack_WrongField(t *testing.T) {
 
 	// Adding test data.
 	trackSlice = append(trackSlice, track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
@@ -384,7 +384,7 @@ func Test_getDetailedTrack_WrongField(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track/1/feil", getDetailedTrack).Methods("GET")
+	router.HandleFunc("/paragliding/api/track/1/feil", GetDetailedTrack).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -398,9 +398,9 @@ func Test_getDetailedTrack_WrongField(t *testing.T) {
 	trackSlice = nil
 }
 
-// Function to test: getDetailedTrack().
+// Function to test: GetDetailedTrack().
 // Test to check the returned status code, content-type and the data for the function.
-func Test_getDetailedTrack(t *testing.T) {
+func Test_GetDetailedTrack(t *testing.T) {
 
 	// Adding test data to compare with, and adds it to the slice.
 	expectedPilot := "pilot1"
@@ -414,7 +414,7 @@ func Test_getDetailedTrack(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/track/1/pilot", getDetailedTrack).Methods("GET")
+	router.HandleFunc("/paragliding/api/track/1/pilot", GetDetailedTrack).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).

@@ -3,7 +3,7 @@
   Contains functions used by API calls to the "Track paths".
 */
 
-package main
+package track
 
 import (
 	"encoding/json"
@@ -61,11 +61,6 @@ var lastUsedID int
 // The start time for the API service.
 var startTime time.Time = time.Now()
 
-// Redirects to the /paragliding/api.
-func redirectToInfo(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, r.RequestURI+"/api", 301)
-}
-
 // Searches for a given track with an ID.
 func retriveTrackByID(id int) (track, error) {
 	// Loops through all tracks.
@@ -80,9 +75,14 @@ func retriveTrackByID(id int) (track, error) {
 	return emptyTrack, errors.New("Could not find any track with given ID")
 }
 
+// Redirects to the /paragliding/api.
+func RedirectToInfo(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, r.RequestURI+"/api", 301)
+}
+
 // GET: Returns information about the API.
 // Output: application/json
-func getAPIInfo(w http.ResponseWriter, r *http.Request) {
+func GetAPIInfo(w http.ResponseWriter, r *http.Request) {
 	// Calculates the duration since application start.
 	// Uses the ISO 8601 Duration format.
 	// The Date package "github.com/rickb777/date/period" is used for this.
@@ -93,7 +93,7 @@ func getAPIInfo(w http.ResponseWriter, r *http.Request) {
 	// Creates a new struct for the API info.
 	currentAPI := apiInfo{timeStr, INFORMATION, VERSION}
 
-	// Converts the strugetAPIInfo.
+	// Converts the struct to json.
 	json, err := json.Marshal(currentAPI)
 	if err != nil {
 		// Sets header status code to 500 "Internal server error" and logs the error.
@@ -215,7 +215,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 
 // POST, GET: Track registration.
 // Input/Output: application/json
-func handleTracks(w http.ResponseWriter, r *http.Request) {
+func HandleTracks(w http.ResponseWriter, r *http.Request) {
 	// Calls functions to handle the GET and POST requests.
 	switch r.Method {
 	case "GET":
@@ -228,7 +228,7 @@ func handleTracks(w http.ResponseWriter, r *http.Request) {
 
 // GET: Returns metadata about a given track with the provided '<id>'.
 // Output: application/json
-func getTrackByID(w http.ResponseWriter, r *http.Request) {
+func GetTrackByID(w http.ResponseWriter, r *http.Request) {
 	var id int
 	// Gets the ID from the URL and converts it to an integer.
 	fmt.Sscanf(r.URL.Path, "/paragliding/api/track/%d", &id)
@@ -261,7 +261,7 @@ func getTrackByID(w http.ResponseWriter, r *http.Request) {
 
 // GET: Returns single detailed metadata about a given tracks field with the provided '<id>' and '<field>'.
 // Output: text/plain.
-func getDetailedTrack(w http.ResponseWriter, r *http.Request) {
+func GetDetailedTrack(w http.ResponseWriter, r *http.Request) {
 	var id int
 	var field string
 
