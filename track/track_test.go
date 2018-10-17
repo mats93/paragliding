@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/mats93/paragliding/data"
 )
 
 // Function to test: retriveTrackByID().
