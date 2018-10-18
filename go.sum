@@ -21,6 +21,8 @@ github.com/marni/goigc v0.1.0 h1:SHv6R7UcM9he4/QaJicAKEKQtj8akMSC9Pr1AZWHibI=
 github.com/marni/goigc v0.1.0/go.mod h1:y4d5K6JJ4pJ+4Vv+MVNHwDNJ5W7wm5jgTOfwtTPtSdI=
 github.com/mattn/goveralls v0.0.2/go.mod h1:8d1ZMHsd7fW6IRPKQh46F2WRpyib5/X4FOpevwGNQEw=
 github.com/mitchellh/mapstructure v0.0.0-20170523030023-d0303fe80992/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
+github.com/mlabouardy/movies-restapi v0.0.0-20171111141509-d336c4a6985e h1:fFxKpQNHGqrqd/7lHJfQOsnQUB6wzixYN4YYcPb7U/4=
+github.com/mlabouardy/movies-restapi v0.0.0-20171111141509-d336c4a6985e/go.mod h1:fQ8+47+VwAUa90ad1rD40ukTBOzWx6Z8klILAhisa0U=
 github.com/pelletier/go-toml v0.0.0-20170628012637-69d355db5304/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/rickb777/date v1.7.2 h1:pZ+oYS4oBobGVoKhp8sRI1dr7CybpH2mZZqrcbXQQZo=
 github.com/rickb777/date v1.7.2/go.mod h1:QSyr5iBR6BU6RjOj5zg0mnp+V061Wb/E7UJU0IgPrug=
@@ -36,4 +38,6 @@ github.com/ziutek/mymysql v0.0.0-20170328153653-1d19cbf98d83/go.mod h1:LMSpPZ6Db
 golang.org/x/sys v0.0.0-20170803140359-d8f5ea21b929/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/text v0.0.0-20170730040918-3bd178b88a81/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/tools v0.0.0-20180904205237-0aa4b8830f48/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce h1:xcEWjVhvbDy+nHP67nPDDpbYrY+ILlfndk4bRioVHaU=
+gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce/go.mod h1:yeKp02qBN3iKW1OzL3MGk2IdtZzaj7SFntXj72NppTA=
 gopkg.in/yaml.v2 v2.0.0-20170721122051-25c4ec802a7d/go.mod h1:JAlM8MvJe8wmxCU4Bli9HhUf9+ttbYbLASfIpnQbh74=

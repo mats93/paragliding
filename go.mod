@@ -6,5 +6,7 @@ require (
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2
 	github.com/marni/goigc v0.1.0
+	github.com/mlabouardy/movies-restapi v0.0.0-20171111141509-d336c4a6985e
 	github.com/rickb777/date v1.7.2
+	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 )

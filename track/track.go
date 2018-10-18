@@ -58,7 +58,7 @@ var trackSlice []track
 // Generates an unique ID for all tracks.
 var lastUsedID int
 
-// The start time for the API service.
+// The start time for the API service. ToDo: Check if this need to be in main.
 var startTime time.Time = time.Now()
 
 // Searches for a given track with an ID.
