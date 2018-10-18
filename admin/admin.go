@@ -1,6 +1,6 @@
 /*
-	File: adminFunctions.go
+	File: admin.go
   Contains functions used by API calls to the "Admin paths".
 */
 
-package main
+package admin

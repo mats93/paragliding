@@ -1,5 +1,5 @@
 /*
-	File: trackFunctions.go
+	File: track.go
   Contains functions used by API calls to the "Track paths".
 */
 

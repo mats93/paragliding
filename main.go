@@ -17,7 +17,6 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/mats93/paragliding/mongodb"
 	"github.com/mats93/paragliding/track"
 )
 
@@ -25,8 +24,6 @@ func main() {
 
 	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
-
-	// Testing.
 
 	// Functions to handle the URL paths.
 	// Track:

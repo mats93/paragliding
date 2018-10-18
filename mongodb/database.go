@@ -1,3 +1,8 @@
+/*
+	File: database.go
+  Handles the mongoDB.
+*/
+
 package mongodb
 
 import (
@@ -11,6 +16,4 @@ import (
 func Test() {
 	session, _ := mgo.Dial("mongodb://admin:passord1@ds233763.mlab.com:33763/paragliding_db")
 	fmt.Println(session)
-	fmt.Println("Test fra mongoDB")
-
 }
