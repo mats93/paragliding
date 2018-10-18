@@ -15,7 +15,7 @@ import (
 )
 
 // COLLECTION is a MongoDB collection.
-const COLLECTION = "test"
+const COLLECTION = "Tracks"
 
 // Track is the metadata about the track that will be stored in the database.
 type Track struct {
@@ -36,8 +36,8 @@ type MongoDB struct {
 	Password string
 }
 
-// Name of the Database.
-var db *mgo.Database
+// Name of the Database that is connected.
+var MDB *mgo.Database
 
 // Connect to the database.
 func (m *MongoDB) Connect() {
@@ -49,7 +49,7 @@ func (m *MongoDB) Connect() {
 	session, _ := mgo.Dial(dbURL)
 
 	// Saves the name of the Database that was connected.
-	db = session.DB(m.Database)
+	MDB = session.DB(m.Database)
 }
 
 // Find all entries in the collection.
@@ -57,7 +57,7 @@ func (m *MongoDB) FindAll() ([]Track, error) {
 	var results []Track
 
 	// Find all tracks in the collection.
-	err := db.C(COLLECTION).Find(bson.M{}).All(&results)
+	err := MDB.C(COLLECTION).Find(bson.M{}).All(&results)
 
 	// Returns the struct, and error if any.
 	return results, err
@@ -68,47 +68,48 @@ func (m *MongoDB) FindByID(id int) ([]Track, error) {
 	var result []Track
 
 	// Find track with given 'id'.
-	err := db.C(COLLECTION).Find(bson.M{"id": id}).All(&result)
+	err := MDB.C(COLLECTION).Find(bson.M{"id": id}).All(&result)
 
 	// Generate error if track with given ID was not found.
 	if result == nil {
 		err = errors.New("not found")
 	}
-
 	// Returns the struct, and error if any.
 	return result, err
 }
 
 // Insert a new Struct into the database.
 func (m *MongoDB) Insert(t Track) error {
-	err := db.C(COLLECTION).Insert(&t)
+	err := MDB.C(COLLECTION).Insert(&t)
 	return err
 }
 
 // Get a count of all tracks in the database.
 func (m *MongoDB) GetCount() (int, error) {
-	count, err := db.C(COLLECTION).Count()
+	count, err := MDB.C(COLLECTION).Count()
 	if err != nil {
 		return 0, err
 	}
+	// Returns the count of all tracks and no error.
 	return count, nil
 }
 
-// Delete all entries in the database collection.
-func (m *MongoDB) DeleteAllTracks() {
-	_, err := db.C(COLLECTION).RemoveAll(bson.M{})
-	if err != nil {
-		fmt.Println(err)
-	}
+// Deletes all entries in the database collection.
+func (m *MongoDB) DeleteAllTracks() error {
+	_, err := MDB.C(COLLECTION).RemoveAll(bson.M{})
+	return err
 }
 
+// DatabaseInit Initialises the database, and connects to it.
 func DatabaseInit() MongoDB {
 	database := MongoDB{
 		"ds233763.mlab.com:33763",
 		"paragliding_db",
-		"admin",
-		"passord1",
+		"paragliderAPI",
+		"6oLKQOFcxMDCZyd",
 	}
+	// Connets to the database and returns the struct.
+	database.Connect()
 	return database
 }
 
@@ -119,8 +120,8 @@ func TestDb() {
 	database := MongoDB{
 		"ds233763.mlab.com:33763",
 		"paragliding_db",
-		"admin",
-		"passord1",
+		"paragliderAPI",
+		"6oLKQOFcxMDCZyd",
 	}
 
 	// Connects to the database.
@@ -163,5 +164,5 @@ func TestDb() {
 		fmt.Printf("Det er %d tracks i databasen \n", count)
 	}
 	// Closes the database session.
-	defer db.Session.Close()
+	defer MDB.Session.Close()
 }

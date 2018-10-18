@@ -3,10 +3,10 @@
 	Contains the main program of the paraglider API.
 
   Information about the program:
-	  RESTful json API.
-		Assignment 2: IGC track viewer extended - IMT2681-2018 (Cloud Technologies)
+  RESTful json API.
+  Assignment 2: IGC track viewer extended - IMT2681-2018 (Cloud Technologies)
 
-	  By Mats Ove Mandt Skjærstein.
+	By Mats Ove Mandt Skjærstein.
 */
 
 package main
@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/mats93/paragliding/admin"
 	"github.com/mats93/paragliding/mongodb"
 	"github.com/mats93/paragliding/track"
 )
@@ -47,11 +48,11 @@ func main() {
 	// Webhook:
 	router.HandleFunc("/paragliding/api/webhook/new_track/", ) // POST
 	router.HandleFunc("/paragliding/api/webhook/new_track/<webhook_id>", ) GET og DELETE
+	*/
 
 	// Admin:
-	router.HandleFunc("/paragliding/admin/api/tracks_count", GetTrackCount)
-	router.HandleFunc("/paragliding/admin/api/tracks", DeleteAllTracks) // DELETE
-	*/
+	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
+	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks)
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")
