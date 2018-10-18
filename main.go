@@ -49,8 +49,8 @@ func main() {
 	router.HandleFunc("/paragliding/api/webhook/new_track/<webhook_id>", ) GET og DELETE
 
 	// Admin:
-	router.HandleFunc("/paragliding/admin/api/tracks_count", )
-	router.HandleFunc("/paragliding/admin/api/tracks", ) // DELETE
+	router.HandleFunc("/paragliding/admin/api/tracks_count", GetTrackCount)
+	router.HandleFunc("/paragliding/admin/api/tracks", DeleteAllTracks) // DELETE
 	*/
 
 	// Gets the port from enviroment var.
