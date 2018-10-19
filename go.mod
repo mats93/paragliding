@@ -5,6 +5,7 @@ require (
 	github.com/golang/geo v0.0.0-20181008215305-476085157cff // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/marni/goigc v0.1.0
 	github.com/mitchellh/mapstructure v1.1.2 // indirect

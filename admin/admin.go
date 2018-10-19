@@ -17,7 +17,7 @@ import (
 // Output: text/plain
 func GetTrackCount(w http.ResponseWriter, r *http.Request) {
 	// Connects to the database.
-	database := mongodb.DatabaseInit()
+	database := mongodb.DatabaseInit("Tracks")
 
 	count, err := database.GetCount()
 	if err != nil {
@@ -44,7 +44,7 @@ func GetTrackCount(w http.ResponseWriter, r *http.Request) {
 // Output: text/plain
 func DeleteAllTracks(w http.ResponseWriter, r *http.Request) {
 	// Connects to the database.
-	database := mongodb.DatabaseInit()
+	database := mongodb.DatabaseInit("Tracks")
 
 	// Gets the current count of the database.
 	count, err := database.GetCount()

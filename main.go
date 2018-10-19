@@ -12,14 +12,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/mats93/paragliding/admin"
-	"github.com/mats93/paragliding/mongodb"
 	"github.com/mats93/paragliding/track"
 )
 
@@ -27,10 +25,6 @@ func main() {
 
 	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
-
-	// Test the db.
-	mongodb.TestDb()
-	fmt.Println("\nTest done")
 
 	// Functions to handle the URL paths.
 	// Track:
@@ -52,7 +46,7 @@ func main() {
 
 	// Admin:
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
-	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks)
+	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks) // ToDo: Change to method: DELETE
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")
