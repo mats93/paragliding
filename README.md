@@ -6,7 +6,7 @@ This application is a RESTful API to upload and browse [IGC files.](https://www.
 ***
 
 ## Available API calls:
-### Tracks
+### Tracks:
 ```
 GET:  /paragliding/api                     - Returns information about the API.
 POST: /paragliding/api/track               - Takes the URL in an json format and inserts a new track, returns the tracks ID.
@@ -36,10 +36,33 @@ DELETE: /paragliding/admin/api/tracks         - Deletes all tracks in the DB.
 
 ***
 
+## How this app is deployed:
+ * The app runs in Heroku at https://paragliding-api.herokuapp.com/
+ * The database (MongoDB) is stored in [mlab.com](https://mlab.com/) MongoLabs Sandbox.
+ * The ticer end-point is implemented within the Heroku deployment (as part of the API).
+ * The "clock" trigger is implemented in Go as an independent executable deployed on OpenStack [(link)](https://google.com)
+
+***
+## Application testing
+
+### Static code analysis:
+- [x] go build
+- [x] go tool vet
+- [x] go fmt
+- [] golint
+- [-] gometalinter
+
+### Unit test coverage:
+ * admin   - x%
+ * mongodb - x%
+ * ticker  - x%
+ * track   - x%
+ * webhook - x%
+
+***
+
 ## Additional information:
-The app runs in Heroku at https://paragliding-api.herokuapp.com/
 
-The program will store IGC files metadata in a NoSQL Database (MongoDB).
+[Link to the task details](https://google.com)
 
-
-Created by Mats
+Created by Mats Ove Mandt Skjærstein, 2018
