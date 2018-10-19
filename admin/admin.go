@@ -9,11 +9,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/mats93/paragliding/mongodb"
 )
 
-// The collection to use.
+// The database collection to use.
 const COLLECTION = "Tracks"
 
 // GET: Returns the current count of all tracks in the DB.
@@ -76,5 +77,19 @@ func DeleteAllTracks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Closes the database session.
+	defer mongodb.MDB.Session.Close()
+}
+
+// ToDo: Delete this
+func InsertSomeTracks(w http.ResponseWriter, r *http.Request) {
+	// Connects to the database.
+	database := mongodb.DatabaseInit(COLLECTION)
+	// Inserts 5 tracks to the database.
+	database.Insert(mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(mongodb.Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(mongodb.Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(mongodb.Track{4, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
+	database.Insert(mongodb.Track{5, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
+
 	defer mongodb.MDB.Session.Close()
 }

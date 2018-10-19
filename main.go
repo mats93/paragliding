@@ -15,13 +15,20 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/mats93/paragliding/admin"
 	"github.com/mats93/paragliding/track"
 )
 
+// The start time for the API service.
+var startTime = time.Now()
+
 func main() {
+
+	// Injects the startime to the track package.
+	track.StartTime = startTime
 
 	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
@@ -46,7 +53,8 @@ func main() {
 
 	// Admin:
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
-	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks) // ToDo: Change to method: DELETE
+	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks)  // ToDo: Change to method: DELETE
+	router.HandleFunc("/paragliding/admin/api/insert", admin.InsertSomeTracks) // ToDo: Remove this.
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")

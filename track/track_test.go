@@ -14,8 +14,11 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/mats93/paragliding/mongodb"
+	"github.com/rickb777/date/period"
 )
 
+/* Replaced by mongodb method.
 // Function to test: retriveTrackByID().
 // Test if the correct ID is returned.
 func Test_retriveTrackByID(t *testing.T) {
@@ -43,7 +46,7 @@ func Test_retriveTrackByID(t *testing.T) {
 
 	// Sets the trackSlice to nil (empty).
 	trackSlice = nil
-}
+} */
 
 // Function to test: GetAPIInfo().
 // Test to check the returned status code, content-type and data for the function.
@@ -74,10 +77,15 @@ func Test_GetAPIInfo(t *testing.T) {
 			content, "application/json")
 	}
 
-	// Excpected result from the API call.
-	expected := apiInfo{"P0D", INFORMATION, VERSION}
+	// Calculates the start time of the app.
+	duration := time.Since(StartTime)
+	p, _ := period.NewOf(duration)
+	timeStr := p.String()
 
-	// Adding test data to compare with ("P0D" is what time.Time returns).
+	// Excpected result from the API call.
+	expected := apiInfo{timeStr, INFORMATION, VERSION}
+
+	// Adding test data to compare with.
 	var actual apiInfo
 	decoder := json.NewDecoder(recorder.Body)
 	decoder.Decode(&actual)
@@ -91,8 +99,10 @@ func Test_GetAPIInfo(t *testing.T) {
 
 // Function to test: HandleTracks().
 // Test to check the returned status code, content-type and data for the function.
-// Tests the GET request with zero tracks in memory.
-func Test_HandleTracks_GET_NoTracks(t *testing.T) {
+func Test_HandleTracks(t *testing.T) {
+	// Connects the the database.
+	database := mongodb.DatabaseInit(COLLECTION)
+
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track", nil)
 
@@ -103,13 +113,6 @@ func Test_HandleTracks_GET_NoTracks(t *testing.T) {
 	// Tests the function.
 	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("GET")
 	router.ServeHTTP(recorder, request)
-
-	// Check the status code is what we expect (404).
-	status := recorder.Code
-	if status != http.StatusNotFound {
-		t.Errorf("Handler returned wrong status code: got %v want %v",
-			status, http.StatusNotFound)
-	}
 
 	// Check if the content-type is what we expect (application/json).
 	content := recorder.HeaderMap.Get("content-type")
@@ -118,47 +121,53 @@ func Test_HandleTracks_GET_NoTracks(t *testing.T) {
 			content, "application/json")
 	}
 
-	// Check the response body is what we expect, when 0 elements are in memory.
-	expected := "[]"
+	// The actual retuned data.
 	actual := recorder.Body.String()
 
-	if actual != expected {
-		t.Errorf("Handler returned wrong data: got %v want %v",
-			actual, expected)
+	// Gets the Count of Tracks in the DB.
+	count, _ := database.GetCount()
+
+	// Check if there are any tracks in the DB.
+	if count == 0 {
+		// Check the status code is what we expect (200).
+		status := recorder.Code
+		if status != http.StatusNotFound {
+			t.Errorf("Handler returned wrong status code: got %v want %v",
+				status, http.StatusNotFound)
+		}
+		// Expected resulsts when the DB is empty.
+		expectedWhenEmpty := "[]"
+
+		// Checks if data returned is the same as expected (empty array).
+		if actual != expectedWhenEmpty {
+			t.Errorf("Handler returned wrong data: got %v want %v",
+				actual, expectedWhenEmpty)
+		}
+	} else {
+		// Check the status code is what we expect (200).
+		status := recorder.Code
+		if status != http.StatusOK {
+			t.Errorf("Handler returned wrong status code: got %v want %v",
+				status, http.StatusOK)
+		}
+		// Slice of ints, to hold the IDs.
+		var intSlice []int
+
+		// Gets all tracks from the database.
+		// Loops through them, appending their ID to the new slice.
+		tracks, _ := database.FindAll()
+		for i := 0; i < len(tracks); i++ {
+			intSlice = append(intSlice, tracks[i].ID)
+		}
+		// Converts the struct to json.
+		expected, _ := json.Marshal(intSlice)
+
+		// Checks if data returned is the same as the contents of the DB.
+		if actual != string(expected) {
+			t.Errorf("Handler returned wrong data: got %v want %v",
+				actual, string(expected))
+		}
 	}
-}
-
-// Tests the GET request with 3 tracks in memory.
-func Test_HandleTracks_GET_WithTracks(t *testing.T) {
-
-	// Adding test data to compare with
-	trackSlice = append(trackSlice,
-		track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"},
-		track{2, time.Now(), "pilot2", "glider2", "glider_id2", 22, "http://test.test"},
-		track{3, time.Now(), "pilot3", "glider3", "glider_id3", 23, "http://test.test"})
-
-	// Creates a request that is passed to the handler.
-	request, _ := http.NewRequest("GET", "/paragliding/api/track", nil)
-
-	// Creates the recorder and router.
-	recorder := httptest.NewRecorder()
-	router := mux.NewRouter()
-
-	// Tests the function.
-	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("GET")
-	router.ServeHTTP(recorder, request)
-
-	// Check the response body is what we expect, when 3 elements are in memory.
-	expected := "[1,2,3]"
-	actual := recorder.Body.String()
-
-	if actual != expected {
-		t.Errorf("Handler returned wrong data: got %v want %v",
-			actual, expected)
-	}
-
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
 }
 
 // Function to test: HandleTracks().
@@ -305,7 +314,7 @@ func Test_GetTrackByID_NoTrackExists(t *testing.T) {
 func Test_GetTrackByID(t *testing.T) {
 
 	// Adding test data to compare with, and adds it to the slice.
-	trackTest := track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
+	trackTest := mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
 	trackSlice = append(trackSlice, trackTest)
 
 	// Creates a request that is passed to the handler.
@@ -374,7 +383,7 @@ func Test_GetDetailedTrack_WrongID(t *testing.T) {
 func Test_GetDetailedTrack_WrongField(t *testing.T) {
 
 	// Adding test data.
-	trackSlice = append(trackSlice, track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
+	trackSlice = append(trackSlice, mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/feil", nil)
@@ -404,7 +413,7 @@ func Test_GetDetailedTrack(t *testing.T) {
 
 	// Adding test data to compare with, and adds it to the slice.
 	expectedPilot := "pilot1"
-	trackSlice = append(trackSlice, track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
+	trackSlice = append(trackSlice, mongodb.Track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/pilot", nil)

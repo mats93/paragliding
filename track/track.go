@@ -15,6 +15,7 @@ import (
 	"time"
 
 	igc "github.com/marni/goigc"
+	"github.com/mats93/paragliding/mongodb"
 	"github.com/rickb777/date/period"
 )
 
@@ -24,16 +25,8 @@ const INFORMATION = "Service for Paragliding tracks"
 // VERSION = The API version that is currently running.
 const VERSION = "v1"
 
-// Format for the IGC file.
-type track struct {
-	ID          int       `json:"-"`
-	HDate       time.Time `json:"H_date"`
-	Pilot       string    `json:"pilot"`
-	Glider      string    `json:"glider"`
-	GliderID    string    `json:"glider_id"`
-	TrackLength float64   `json:"track_length"`
-	TrackSrcURL string    `json:"track_src_url"`
-}
+// The MongoDB collection to use.
+const COLLECTION = "Tracks"
 
 // Format for the API information.
 type apiInfo struct {
@@ -52,17 +45,17 @@ type id struct {
 	ID int `json:"id"`
 }
 
-// Slice with structs of type "track" (in-memory storage).
-var trackSlice []track
+// Slice with structs of type "track" (in-memory storage). // ToDo: Use database instead.
+var trackSlice []mongodb.Track
 
-// Generates an unique ID for all tracks.
+// Generates an unique ID for all tracks. ToDo: Replace with something else from the database.
 var lastUsedID int
 
-// The start time for the API service. ToDo: Check if this need to be in main.
-var startTime time.Time = time.Now()
+// The start time for the API service. Gets injected from main.
+var StartTime time.Time
 
-// Searches for a given track with an ID.
-func retriveTrackByID(id int) (track, error) {
+// Searches for a given track with an ID. // ToDo: Replace with mongodb Find ID method.
+func retriveTrackByID(id int) (mongodb.Track, error) {
 	// Loops through all tracks.
 	for _, tr := range trackSlice {
 		// If a track with the same ID as the parameter is found, return the track and no error.
@@ -71,7 +64,7 @@ func retriveTrackByID(id int) (track, error) {
 		}
 	}
 	// If no tracks was found, return an empty track and an error.
-	emptyTrack := track{}
+	emptyTrack := mongodb.Track{}
 	return emptyTrack, errors.New("Could not find any track with given ID")
 }
 
@@ -86,7 +79,7 @@ func GetAPIInfo(w http.ResponseWriter, r *http.Request) {
 	// Calculates the duration since application start.
 	// Uses the ISO 8601 Duration format.
 	// The Date package "github.com/rickb777/date/period" is used for this.
-	duration := time.Since(startTime)
+	duration := time.Since(StartTime)
 	p, _ := period.NewOf(duration)
 	timeStr := p.String()
 
@@ -112,16 +105,22 @@ func GetAPIInfo(w http.ResponseWriter, r *http.Request) {
 // GET: Returns an array of al track IDs.
 // Output: application/json.
 func allTrackIDs(w http.ResponseWriter, r *http.Request) {
-	// Check if there are tracks stored in memory.
-	if trackSlice != nil {
-		// There are tracks stored in the trackSlice.
+	// Connects to the database.
+	database := mongodb.DatabaseInit(COLLECTION)
 
+	// Gets the Count of Tracks in the DB.
+	count, _ := database.GetCount()
+
+	// Check if there are any tracks in the DB.
+	if count != 0 {
 		// Slice of ints, to hold the IDs.
 		var idSlice []int
 
-		// Loops through the trackSlice, and adds the Ids to the new slice.
-		for i := 0; i < len(trackSlice); i++ {
-			idSlice = append(idSlice, trackSlice[i].ID)
+		// Gets all tracks from the database.
+		// Loops through them, appending their ID to the new slice.
+		tracks, _ := database.FindAll()
+		for i := 0; i < len(tracks); i++ {
+			idSlice = append(idSlice, tracks[i].ID)
 		}
 
 		// Converts the struct to json.
@@ -139,7 +138,7 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(json))
 		}
 	} else {
-		// There are no tracks stored in the trackSlice.
+		// There are no tracks stored in the DB.
 		// Sets header content-type to application/json and status code to 404 (Not found).
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
@@ -147,10 +146,9 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 		// Returns an empty array.
 		w.Write([]byte("[]"))
 	}
-
 }
 
-// POST: Takes the post request as json format and inserts a new track to the trackSlice.
+// POST: Takes the post request as json format and inserts a new track to the DB.
 // Input/Output: application/json
 func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 	var newURL url
@@ -191,7 +189,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 
 			// Adds the new track to the trackSlice.
 			trackSlice = append(trackSlice,
-				track{lastUsedID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
+				mongodb.Track{lastUsedID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
 					trackFile.GliderID, sum, newURL.URL})
 
 			// Converts the id to json format by using the id struct and Marshaling the struct to json.
