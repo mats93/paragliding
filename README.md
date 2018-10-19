@@ -3,6 +3,8 @@ Assignment 2 in the course IMT2681-2018 (Cloud Technologies) at NTNU Gjøvik.
 
 This application is a RESTful API to upload and browse [IGC files.](https://www.fai.org/sites/default/files/documents/igc_fr_spec_with_al4a_2016-4-10.pdf)
 
+***
+
 ## Available API calls:
 ### Tracks
 ```
@@ -31,6 +33,8 @@ DELETE: /paragliding/api/webhook/new_track/<webhook_id>  - Deleting registered w
 GET:    /paragliding/admin/api/tracks_count   - Returns the current count of all tracks in the DB.
 DELETE: /paragliding/admin/api/tracks         - Deletes all tracks in the DB.
 ```
+
+***
 
 ## Additional information:
 The app runs in Heroku at https://paragliding-api.herokuapp.com/
