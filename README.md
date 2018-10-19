@@ -47,10 +47,10 @@ DELETE: /paragliding/admin/api/tracks         - Deletes all tracks in the DB.
 
 ### Static code analysis:
 - [x] go build
-- [x] go tool vet
+- [ ] go tool vet
 - [x] go fmt
-- [] golint
-- [-] gometalinter
+- [x] golint
+- [ ] gometalinter
 
 ### Unit test coverage:
  * admin   - x%
