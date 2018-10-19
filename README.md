@@ -39,17 +39,17 @@ DELETE: /paragliding/admin/api/tracks         - Deletes all tracks in the DB.
 ## How this app is deployed:
  * The app runs in Heroku at https://paragliding-api.herokuapp.com/
  * The database (MongoDB) is stored in [mlab.com](https://mlab.com/) MongoLabs Sandbox.
- * The ticer end-point is implemented within the Heroku deployment (as part of the API).
- * The "clock" trigger is implemented in Go as an independent executable deployed on OpenStack [(link)](https://google.com)
+ * The ticker end-point is implemented within the Heroku deployment (as part of the API).
+ * The "clock" trigger is implemented in Go as an independent executable deployed on OpenStack [(link Temp)](https://google.com)
 
 ***
 ## Application testing
 
 ### Static code analysis:
-- [x] go build
+- [ ] go build
 - [ ] go tool vet
-- [x] go fmt
-- [x] golint
+- [ ] go fmt
+- [ ] golint
 - [ ] gometalinter
 
 ### Unit test coverage:
@@ -63,6 +63,6 @@ DELETE: /paragliding/admin/api/tracks         - Deletes all tracks in the DB.
 
 ## Additional information:
 
-[Link to the task details](https://google.com)
+[Link to the task details Temp](https://google.com)
 
 Created by Mats Ove Mandt Skjærstein, 2018
