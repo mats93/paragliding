@@ -50,7 +50,7 @@ func Test_DeleteAllTracks(t *testing.T) {
 	// Expected count when all 5 tracks are deleted.
 	expected := 0
 
-	// Inserts 5 tracks to the databae.
+	// Inserts 5 tracks to the database.
 	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
 	database.Insert(Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
 	database.Insert(Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
@@ -241,6 +241,58 @@ func Test_GetCount(t *testing.T) {
 	// Check if correct count was returned (1).
 	if actual != expected {
 		t.Errorf("Method returned wrong count: got %d want %d",
+			actual, expected)
+	}
+
+	// Deletes all from the database.
+	database.DeleteAllTracks()
+
+	// Closes the database session.
+	defer MDB.Session.Close()
+}
+
+// Method to test: GetNewID().
+// Test if the correct ID is returned, when the database is empty.
+func Test_GetNewID_Empty(t *testing.T) {
+	database := DatabaseInit(COLLECTION)
+
+	// The expected ID to be generated.
+	expected := 1
+
+	// Check if the Generated ID is correct.
+	count, _ := database.GetCount()
+	actual := count + 1
+
+	if actual != expected {
+		t.Errorf("Method generated wrong ID: got %d want %d",
+			actual, expected)
+	}
+
+	// Closes the database session.
+	defer MDB.Session.Close()
+}
+
+// Method to test: GetNewID().
+// Test if the correct ID is returned, when the database has content.
+func Test_GetNewID(t *testing.T) {
+	database := DatabaseInit(COLLECTION)
+
+	// Inserts 5 tracks to the database.
+	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(Track{4, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
+	database.Insert(Track{5, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
+
+	// The expected ID to be generated after inserting 5 tracks with ID 1-5.
+	expected := 6
+
+	// Check if the Generated ID is correct.
+	count, _ := database.GetCount()
+	actual := count + 1
+
+	if actual != expected {
+		t.Errorf("Method generated wrong ID: got %d want %d",
 			actual, expected)
 	}
 

@@ -13,11 +13,14 @@ import (
 	"github.com/mats93/paragliding/mongodb"
 )
 
+// The collection to use.
+const COLLECTION = "Tracks"
+
 // GET: Returns the current count of all tracks in the DB.
 // Output: text/plain
 func GetTrackCount(w http.ResponseWriter, r *http.Request) {
 	// Connects to the database.
-	database := mongodb.DatabaseInit("Tracks")
+	database := mongodb.DatabaseInit(COLLECTION)
 
 	count, err := database.GetCount()
 	if err != nil {
@@ -44,7 +47,7 @@ func GetTrackCount(w http.ResponseWriter, r *http.Request) {
 // Output: text/plain
 func DeleteAllTracks(w http.ResponseWriter, r *http.Request) {
 	// Connects to the database.
-	database := mongodb.DatabaseInit("Tracks")
+	database := mongodb.DatabaseInit(COLLECTION)
 
 	// Gets the current count of the database.
 	count, err := database.GetCount()

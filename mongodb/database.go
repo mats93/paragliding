@@ -97,7 +97,16 @@ func (m *MongoDB) GetCount() (int, error) {
 	return count, nil
 }
 
+// Returns a new ID that wil be used in the Track.
+func (m *MongoDB) GetNewID() int {
+	// For readability, mongoDB`s ID wil not be used.
+	// The new ID is simply the Count of all objects in the db + 1.
+	count, _ := MDB.C(m.Collection).Count()
+	return count + 1
+}
+
 // DatabaseInit Initialises the database, and connects to it.
+// The collection to use is given by the parameter.
 func DatabaseInit(coll string) MongoDB {
 	database := MongoDB{
 		"ds233763.mlab.com:33763",
