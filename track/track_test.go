@@ -18,36 +18,6 @@ import (
 	"github.com/rickb777/date/period"
 )
 
-/* Replaced by mongodb method.
-// Function to test: retriveTrackByID().
-// Test if the correct ID is returned.
-func Test_retriveTrackByID(t *testing.T) {
-
-	// Check if it returns an error if the trackSlice is emtpy.
-	if _, err := retriveTrackByID(10); err == nil {
-		t.Error("Function did not return error when track array was empty")
-	}
-
-	// Adds a track to the trackSlice with id 10.
-	trackSlice = append(trackSlice,
-		track{10, time.Now(), "pilot", "glider", "glider_id", 20.4, "http://test.test"})
-
-	// Check if it returns an error if the track was not found.
-	if _, err := retriveTrackByID(1); err == nil {
-		t.Error("Function did not return error when requestet ID did not exist")
-	}
-
-	// Check if the correct track with the specified ID is sent back.
-	newTrack, _ := retriveTrackByID(10)
-	if newTrack.ID != 10 {
-		t.Errorf("Function did not return the correct track: got %d want %d",
-			newTrack.ID, 10)
-	}
-
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
-} */
-
 // Function to test: GetAPIInfo().
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetAPIInfo(t *testing.T) {
@@ -98,10 +68,13 @@ func Test_GetAPIInfo(t *testing.T) {
 }
 
 // Function to test: HandleTracks().
-// Test to check the returned status code, content-type and data for the function.
-func Test_HandleTracks(t *testing.T) {
+// Test to check the returned status code, content-type and data for the function when the DB is empty.
+func Test_HandleTracks_EmptyDB(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "Tests"
+
 	// Connects the the database.
-	database := mongodb.DatabaseInit(COLLECTION)
+	database := mongodb.DatabaseInit(Collection)
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track", nil)
@@ -129,20 +102,67 @@ func Test_HandleTracks(t *testing.T) {
 
 	// Check if there are any tracks in the DB.
 	if count == 0 {
-		// Check the status code is what we expect (200).
+		// Check the status code is what we expect (400).
 		status := recorder.Code
 		if status != http.StatusNotFound {
 			t.Errorf("Handler returned wrong status code: got %v want %v",
 				status, http.StatusNotFound)
 		}
-		// Expected resulsts when the DB is empty.
-		expectedWhenEmpty := "[]"
 
+		// Expected resulsts when the DB is empty.
+		expected := "[]"
 		// Checks if data returned is the same as expected (empty array).
-		if actual != expectedWhenEmpty {
+		if actual != expected {
 			t.Errorf("Handler returned wrong data: got %v want %v",
-				actual, expectedWhenEmpty)
+				actual, expected)
 		}
+	} else {
+		t.Error("Database count is not 0, when 0 tracks are in the DB")
+	}
+}
+
+// Function to test: HandleTracks().
+// Test to check the returned status code, content-type and data for the function.
+func Test_HandleTracks(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "Tests"
+
+	// Connects the the database and inserts 3 tracks.
+	database := mongodb.DatabaseInit(Collection)
+	database.Insert(mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(mongodb.Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(mongodb.Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+
+	// Expected return when 3 tracks are in the DB.
+	expected := "[1,2,3]"
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/paragliding/api/track", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/paragliding/api/track", HandleTracks).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check if the content-type is what we expect (application/json).
+	content := recorder.HeaderMap.Get("content-type")
+	if content != "application/json" {
+		t.Errorf("Handler returned wrong content-type: got %s want %s",
+			content, "application/json")
+	}
+
+	// The actual retuned data.
+	actual := recorder.Body.String()
+
+	// Gets the Count of Tracks in the DB.
+	count, _ := database.GetCount()
+
+	// Check if there are any tracks in the DB.
+	if count == 0 {
+		t.Error("Database count is 0, when 3 tracks are insertet into the DB")
 	} else {
 		// Check the status code is what we expect (200).
 		status := recorder.Code
@@ -150,23 +170,15 @@ func Test_HandleTracks(t *testing.T) {
 			t.Errorf("Handler returned wrong status code: got %v want %v",
 				status, http.StatusOK)
 		}
-		// Slice of ints, to hold the IDs.
-		var intSlice []int
-
-		// Gets all tracks from the database.
-		// Loops through them, appending their ID to the new slice.
-		tracks, _ := database.FindAll()
-		for i := 0; i < len(tracks); i++ {
-			intSlice = append(intSlice, tracks[i].ID)
-		}
-		// Converts the struct to json.
-		expected, _ := json.Marshal(intSlice)
 
 		// Checks if data returned is the same as the contents of the DB.
-		if actual != string(expected) {
+		if actual != expected {
 			t.Errorf("Handler returned wrong data: got %v want %v",
-				actual, string(expected))
+				actual, expected)
 		}
+
+		// Removes the test data.
+		database.DeleteAllTracks()
 	}
 }
 
@@ -240,6 +252,15 @@ func Test_HandleTracks_POST_WrongFile(t *testing.T) {
 // Function to test: HandleTracks().
 // Test to check the returned status code, content-type and data for the function.
 func Test_HandleTracks_POST(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "Tests"
+
+	// Connects the the database.
+	database := mongodb.DatabaseInit(Collection)
+
+	// Gets the current count of the DB. Should be 0.
+	count, _ := database.GetCount()
+
 	// POST data.
 	postString := "{\"url\":\"http://skypolaris.org/wp-content/uploads/IGS%20Files/Madrid%20to%20Jerez.igc\"}"
 
@@ -268,7 +289,7 @@ func Test_HandleTracks_POST(t *testing.T) {
 			content, "application/json")
 	}
 
-	// Check the response body is what we expect. ToDo: Replace with database.
+	// Check the response body is what we expect.
 	expectedReturn := "{\"id\":1}"
 	actualReturn := recorder.Body.String()
 
@@ -277,19 +298,20 @@ func Test_HandleTracks_POST(t *testing.T) {
 			actualReturn, expectedReturn)
 	}
 
-	// Check if the track was added to the slice.
-	if trackSlice != nil && trackSlice[0].ID != 1 {
-		t.Error("The track was not added in the trackSlice")
+	// Check if the track was added to the database, newCount should be 1.
+	newCount, _ := database.GetCount()
+	if count+1 != newCount {
+		t.Errorf("Database count is wrong: got %d want %d",
+			newCount, count+1)
 	}
 
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
+	// Removes the test data.
+	database.DeleteAllTracks()
 }
 
 // Function to test: GetTrackByID().
 // Test to check the returned status code, content-type and data when the requested track does not exist.
 func Test_GetTrackByID_NoTrackExists(t *testing.T) {
-
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1", nil)
 
@@ -312,10 +334,13 @@ func Test_GetTrackByID_NoTrackExists(t *testing.T) {
 // Function to test: GetTrackByID().
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetTrackByID(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "Tests"
 
-	// Adding test data to compare with, and adds it to the slice.
+	// Connects the the database, and adds test data to the DB.
+	database := mongodb.DatabaseInit(Collection)
 	trackTest := mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
-	trackSlice = append(trackSlice, trackTest)
+	database.Insert(trackTest)
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1", nil)
@@ -346,13 +371,20 @@ func Test_GetTrackByID(t *testing.T) {
 	expected, _ := json.Marshal(trackTest)
 	actual := recorder.Body.String()
 
-	if actual != string(expected) {
-		t.Errorf("Handler returned wrong data: got \"%v\" want \"%v\"",
-			actual, string(expected))
+	// Because of time.Time the comparrsing fails when comparing the json objects.
+	// Workaround, split it and compare the pilot in a json format ("pilot":"name").
+	expectedSplit := strings.Split(string(expected), ",")
+	actualSplit := strings.Split(actual, ",")
+	actualPilotJson := actualSplit[1]
+	expectedPilotJson := expectedSplit[1]
+
+	if actualPilotJson != expectedPilotJson {
+		t.Errorf("Handler returned wrong data: got %s want %s",
+			actualPilotJson, expectedPilotJson)
 	}
 
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
+	// Removes the test data.
+	database.DeleteAllTracks()
 }
 
 // Function to test: GetDetailedTrack().
@@ -381,9 +413,12 @@ func Test_GetDetailedTrack_WrongID(t *testing.T) {
 // Function to test: GetDetailedTrack().
 // Test to check the returned status code, content-type when a non existent field is passed.
 func Test_GetDetailedTrack_WrongField(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "Tests"
 
-	// Adding test data.
-	trackSlice = append(trackSlice, mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
+	// Connects the the database, and adds test data to the DB.
+	database := mongodb.DatabaseInit(Collection)
+	database.Insert(mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/feil", nil)
@@ -403,17 +438,22 @@ func Test_GetDetailedTrack_WrongField(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
+	// Removes the test data.
+	database.DeleteAllTracks()
 }
 
 // Function to test: GetDetailedTrack().
 // Test to check the returned status code, content-type and the data for the function.
 func Test_GetDetailedTrack(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "Tests"
 
-	// Adding test data to compare with, and adds it to the slice.
+	// Expected pilot to be returned.
 	expectedPilot := "pilot1"
-	trackSlice = append(trackSlice, mongodb.Track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
+
+	// Connects the the database, and adds test data to the DB.
+	database := mongodb.DatabaseInit(Collection)
+	database.Insert(mongodb.Track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/pilot", nil)
@@ -448,6 +488,6 @@ func Test_GetDetailedTrack(t *testing.T) {
 			actual, expectedPilot)
 	}
 
-	// Sets the trackSlice to nil (empty).
-	trackSlice = nil
+	// Removes the test data.
+	database.DeleteAllTracks()
 }

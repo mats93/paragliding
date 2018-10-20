@@ -7,7 +7,6 @@ package track
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,9 +23,6 @@ const INFORMATION = "Service for Paragliding tracks"
 
 // VERSION = The API version that is currently running.
 const VERSION = "v1"
-
-// The MongoDB collection to use.
-const COLLECTION = "Tracks"
 
 // Format for the API information.
 type apiInfo struct {
@@ -45,28 +41,11 @@ type id struct {
 	ID int `json:"id"`
 }
 
-// Slice with structs of type "track" (in-memory storage). // ToDo: Use database instead.
-var trackSlice []mongodb.Track
-
-// Generates an unique ID for all tracks. ToDo: Replace with something else from the database.
-var lastUsedID int
-
 // The start time for the API service. Gets injected from main.
 var StartTime time.Time
 
-// Searches for a given track with an ID. // ToDo: Replace with mongodb Find ID method.
-func retriveTrackByID(id int) (mongodb.Track, error) {
-	// Loops through all tracks.
-	for _, tr := range trackSlice {
-		// If a track with the same ID as the parameter is found, return the track and no error.
-		if tr.ID == id {
-			return tr, nil
-		}
-	}
-	// If no tracks was found, return an empty track and an error.
-	emptyTrack := mongodb.Track{}
-	return emptyTrack, errors.New("Could not find any track with given ID")
-}
+// The MongoDB collection to use. Gets injected from main or test.
+var Collection string
 
 // Redirects to the /paragliding/api.
 func RedirectToInfo(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +85,7 @@ func GetAPIInfo(w http.ResponseWriter, r *http.Request) {
 // Output: application/json.
 func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 	// Connects to the database.
-	database := mongodb.DatabaseInit(COLLECTION)
+	database := mongodb.DatabaseInit(Collection)
 
 	// Gets the Count of Tracks in the DB.
 	count, _ := database.GetCount()
@@ -151,6 +130,9 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 // POST: Takes the post request as json format and inserts a new track to the DB.
 // Input/Output: application/json
 func insertNewTrack(w http.ResponseWriter, r *http.Request) {
+	// Connects to the database.
+	database := mongodb.DatabaseInit(Collection)
+
 	var newURL url
 
 	// Decodes the json url and converts it to a struct.
@@ -184,16 +166,15 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 				sum += trackFile.Points[i].Distance(trackFile.Points[i+1])
 			}
 
-			// Increments the global ID, to be used for an internal track ID.
-			lastUsedID++
+			// Generates a new ID to be used.
+			newID := database.GetNewID()
 
-			// Adds the new track to the trackSlice.
-			trackSlice = append(trackSlice,
-				mongodb.Track{lastUsedID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
-					trackFile.GliderID, sum, newURL.URL})
+			// Adds the new track to the database.
+			database.Insert(mongodb.Track{newID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
+				trackFile.GliderID, sum, newURL.URL})
 
 			// Converts the id to json format by using the id struct and Marshaling the struct to json.
-			idStruct := id{lastUsedID}
+			idStruct := id{newID}
 			json, err := json.Marshal(idStruct)
 			if err != nil {
 				// Sets header status code to 500 "Internal server error" and logs the error.
@@ -227,14 +208,19 @@ func HandleTracks(w http.ResponseWriter, r *http.Request) {
 // GET: Returns metadata about a given track with the provided '<id>'.
 // Output: application/json
 func GetTrackByID(w http.ResponseWriter, r *http.Request) {
+	// Connects to the database.
+	database := mongodb.DatabaseInit(Collection)
+
 	var id int
 	// Gets the ID from the URL and converts it to an integer.
 	fmt.Sscanf(r.URL.Path, "/paragliding/api/track/%d", &id)
 
 	// Tries to retrive the track with the requestet ID.
 	// Retrieves the ID from the url.
-	if rTrack, err := retriveTrackByID(id); err == nil {
+	rTrackSlice, err := database.FindByID(id)
+	if err == nil {
 		// The request is valid, the track was found.
+		rTrack := rTrackSlice[0]
 
 		// Converts the struct to json and outputs it.
 		json, err := json.Marshal(rTrack)
@@ -260,6 +246,9 @@ func GetTrackByID(w http.ResponseWriter, r *http.Request) {
 // GET: Returns single detailed metadata about a given tracks field with the provided '<id>' and '<field>'.
 // Output: text/plain.
 func GetDetailedTrack(w http.ResponseWriter, r *http.Request) {
+	// Connects to the database.
+	database := mongodb.DatabaseInit(Collection)
+
 	var id int
 	var field string
 
@@ -268,7 +257,8 @@ func GetDetailedTrack(w http.ResponseWriter, r *http.Request) {
 
 	// Tries to retrive the track with the requestet ID.
 	// Retrieves the ID from the url.
-	if rTrack, err := retriveTrackByID(id); err == nil {
+	rTrack, err := database.FindByID(id)
+	if err == nil {
 		// The request is valid, the track was found.
 
 		// Retrieves the field specified, or 404 field not found.
@@ -276,18 +266,18 @@ func GetDetailedTrack(w http.ResponseWriter, r *http.Request) {
 		switch field {
 		case "H_date":
 			// Converts time.Time to string with string() method.
-			output = rTrack.HDate.String()
+			output = rTrack[0].HDate.String()
 		case "pilot":
-			output = rTrack.Pilot
+			output = rTrack[0].Pilot
 		case "glider":
-			output = rTrack.Glider
+			output = rTrack[0].Glider
 		case "glider_id":
-			output = rTrack.GliderID
+			output = rTrack[0].GliderID
 		case "track_length":
 			// Converts float64 to string.
-			output = strconv.FormatFloat(rTrack.TrackLength, 'f', 6, 64)
+			output = strconv.FormatFloat(rTrack[0].TrackLength, 'f', 6, 64)
 		case "track_src_url":
-			output = rTrack.TrackSrcURL
+			output = rTrack[0].TrackSrcURL
 		default:
 			// If the field specified does not match any field in the track.
 			// Sets the header code to 404 (Not found).
