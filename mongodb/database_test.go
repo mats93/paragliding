@@ -19,7 +19,7 @@ func Test_Insert(t *testing.T) {
 	// Connects to the database.
 	database := DatabaseInit(COLLECTION)
 
-	expected := Track{100, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"}
+	expected := Track{100, 10, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"}
 
 	// Check to see if insert generates error.
 	err := database.Insert(expected)
@@ -51,11 +51,11 @@ func Test_DeleteAllTracks(t *testing.T) {
 	expected := 0
 
 	// Inserts 5 tracks to the database.
-	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
-	database.Insert(Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
-	database.Insert(Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
-	database.Insert(Track{4, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
-	database.Insert(Track{5, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
+	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(Track{3, 13, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(Track{4, 14, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
+	database.Insert(Track{5, 15, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
 
 	// Check for errors when deleting.
 	err := database.DeleteAllTracks()
@@ -98,12 +98,12 @@ func Test_FindAll(t *testing.T) {
 	// Expected results from the database.
 	var expected []Track
 	expected = append(expected,
-		Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"},
-		Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+		Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"},
+		Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
 
 	// Test if correct track slice is retunred when collection has data.
-	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
-	database.Insert(Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
 	actual, _ := database.FindAll()
 
 	// Check if method did not return an emtpy slice.
@@ -179,10 +179,10 @@ func Test_FindByID(t *testing.T) {
 	// Expected results from the database.
 	var expected []Track
 	expected = append(expected,
-		Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+		Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
 
 	// Test data.
-	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
 
 	// Check if correct track was returned, when given the ID 1.
 	actual, _ := database.FindByID(1)
@@ -231,7 +231,7 @@ func Test_GetCount(t *testing.T) {
 	expected := 1
 
 	// Test data.
-	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
 
 	actual, err := database.GetCount()
 	if err != nil {
@@ -278,11 +278,11 @@ func Test_GetNewID(t *testing.T) {
 	database := DatabaseInit(COLLECTION)
 
 	// Inserts 5 tracks to the database.
-	database.Insert(Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
-	database.Insert(Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
-	database.Insert(Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
-	database.Insert(Track{4, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
-	database.Insert(Track{5, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
+	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(Track{3, 13, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(Track{4, 14, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
+	database.Insert(Track{5, 15, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
 
 	// The expected ID to be generated after inserting 5 tracks with ID 1-5.
 	expected := 6
@@ -301,4 +301,20 @@ func Test_GetNewID(t *testing.T) {
 
 	// Closes the database session.
 	defer MDB.Session.Close()
+}
+
+// Function to test: GenerateTimestamp().
+// Test if two timestamps are monothonic.
+func Test_GenerateTimestamp(t *testing.T) {
+	first := GenerateTimestamp()
+	second := GenerateTimestamp()
+
+	if first == second {
+		t.Errorf("Both timestamps generetad is the same")
+	}
+
+	if first > second {
+		t.Error("Function is not monothonic, first timestmap has lower value")
+	}
+
 }

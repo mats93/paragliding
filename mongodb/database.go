@@ -16,6 +16,7 @@ import (
 // Track is the metadata about the track that will be stored in the database.
 type Track struct {
 	ID          int       `json:"-"`
+	Timestamp   int64     `json:"-"`
 	HDate       time.Time `bson:"H_date"        json:"H_date"`
 	Pilot       string    `bson:"pilot"         json:"pilot"`
 	Glider      string    `bson:"glider"        json:"glider"`
@@ -118,4 +119,14 @@ func DatabaseInit(coll string) MongoDB {
 	// Connects to the database and returns the struct.
 	database.Connect()
 	return database
+}
+
+// Generates a timestamp for a track.
+// The function is monothonic, it wil always count up.
+func GenerateTimestamp() int64 {
+	// Current time.
+	now := time.Now()
+
+	// Unix time in nanoseconds.(Nanoseconds since januar 1970)
+	return now.UnixNano()
 }
