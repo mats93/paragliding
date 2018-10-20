@@ -11,7 +11,7 @@ import (
 )
 
 // The collection to test against.
-const COLLECTION = "testing"
+const COLLECTION = "Tests"
 
 // Method to test: Insert().
 // Test if the correct track is insertet into the database.

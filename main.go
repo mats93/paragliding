@@ -30,6 +30,10 @@ func main() {
 	// Injects the startime to the track package.
 	track.StartTime = startTime
 
+	// Injects the MongoDB collection to use.
+	track.Collection = "Tracks"
+	admin.Collection = "Tracks"
+
 	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
 
