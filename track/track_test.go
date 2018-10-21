@@ -129,9 +129,9 @@ func Test_HandleTracks(t *testing.T) {
 
 	// Connects the the database and inserts 3 tracks.
 	database := mongodb.DatabaseInit(Collection)
-	database.Insert(mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
-	database.Insert(mongodb.Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
-	database.Insert(mongodb.Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(mongodb.Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(mongodb.Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(mongodb.Track{3, 13, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
 
 	// Expected return when 3 tracks are in the DB.
 	expected := "[1,2,3]"
@@ -339,7 +339,7 @@ func Test_GetTrackByID(t *testing.T) {
 
 	// Connects the the database, and adds test data to the DB.
 	database := mongodb.DatabaseInit(Collection)
-	trackTest := mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
+	trackTest := mongodb.Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"}
 	database.Insert(trackTest)
 
 	// Creates a request that is passed to the handler.
@@ -418,7 +418,7 @@ func Test_GetDetailedTrack_WrongField(t *testing.T) {
 
 	// Connects the the database, and adds test data to the DB.
 	database := mongodb.DatabaseInit(Collection)
-	database.Insert(mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
+	database.Insert(mongodb.Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/feil", nil)
@@ -453,7 +453,7 @@ func Test_GetDetailedTrack(t *testing.T) {
 
 	// Connects the the database, and adds test data to the DB.
 	database := mongodb.DatabaseInit(Collection)
-	database.Insert(mongodb.Track{1, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
+	database.Insert(mongodb.Track{1, 11, time.Now(), expectedPilot, "glider1", "glider_id1", 21, "http://test.test"})
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/track/1/pilot", nil)

@@ -103,11 +103,11 @@ func Test_DeleteAllTracks(t *testing.T) {
 
 	// Connets to the DB and fills it with 5 tracks.
 	database := mongodb.DatabaseInit(Collection)
-	database.Insert(mongodb.Track{1, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
-	database.Insert(mongodb.Track{2, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
-	database.Insert(mongodb.Track{3, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
-	database.Insert(mongodb.Track{4, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
-	database.Insert(mongodb.Track{5, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
+	database.Insert(mongodb.Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(mongodb.Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(mongodb.Track{3, 13, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(mongodb.Track{4, 14, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
+	database.Insert(mongodb.Track{5, 15, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
 
 	// Expected return for the function is 5, because 5 tracks where deletet (all).
 	expected := "5"
