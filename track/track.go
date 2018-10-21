@@ -166,12 +166,18 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 				sum += trackFile.Points[i].Distance(trackFile.Points[i+1])
 			}
 
+			// This part is in critical sector, should be locked by mutex if threads are used.
 			// Generates a new ID to be used.
 			newID := database.GetNewID()
 
+			// Generates a timestamp for the track.
+			timeStamp := mongodb.GenerateTimestamp()
+
 			// Adds the new track to the database.
-			database.Insert(mongodb.Track{newID, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
+			database.Insert(mongodb.Track{newID, timeStamp, trackFile.Header.Date, trackFile.Pilot, trackFile.GliderType,
 				trackFile.GliderID, sum, newURL.URL})
+
+			// Critical sector ends.
 
 			// Converts the id to json format by using the id struct and Marshaling the struct to json.
 			idStruct := id{newID}

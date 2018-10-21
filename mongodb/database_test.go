@@ -314,7 +314,6 @@ func Test_GenerateTimestamp(t *testing.T) {
 	}
 
 	if first > second {
-		t.Error("Function is not monothonic, first timestmap has lower value")
+		t.Error("Function is not monothonic, first timestamp has lower value")
 	}
-
 }
