@@ -17,7 +17,7 @@ import (
 // Track is the metadata about the track that will be stored in the database.
 type Track struct {
 	ID          int       `json:"-"`
-	Timestamp   int64     `bson:"Timestamp"     json:"-"`
+	Timestamp   int64     `bson:"timestamp"     json:"-"`
 	HDate       time.Time `bson:"H_date"        json:"H_date"`
 	Pilot       string    `bson:"pilot"         json:"pilot"`
 	Glider      string    `bson:"glider"        json:"glider"`
@@ -121,7 +121,7 @@ func (m *MongoDB) FindTrackHigherThen(ts int64) ([]Track, error) {
 	var results []Track
 
 	// Queries the database.
-	err := MDB.C(m.Collection).Find(bson.M{"Timestamp": bson.M{"$gt": ts}}).All(&results)
+	err := MDB.C(m.Collection).Find(bson.M{"timestamp": bson.M{"$gt": ts}}).All(&results)
 
 	return results, err
 }
