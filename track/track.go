@@ -296,7 +296,6 @@ func GetDetailedTrack(w http.ResponseWriter, r *http.Request) {
 
 		// Returns the field.
 		w.Write([]byte(output))
-
 	} else {
 		// A track with the given ID does not excist.
 		// Sets the header code to 404 (Not found).

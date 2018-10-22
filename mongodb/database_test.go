@@ -288,8 +288,7 @@ func Test_GetNewID(t *testing.T) {
 	expected := 6
 
 	// Check if the Generated ID is correct.
-	count, _ := database.GetCount()
-	actual := count + 1
+	actual := database.GetNewID()
 
 	if actual != expected {
 		t.Errorf("Method generated wrong ID: got %d want %d",
@@ -297,6 +296,68 @@ func Test_GetNewID(t *testing.T) {
 	}
 
 	// Deletes all from the database.
+	database.DeleteAllTracks()
+
+	// Closes the database session.
+	defer MDB.Session.Close()
+}
+
+// Method to test: FindTrackHigherThen().
+// Test if
+func Test_FindTrackHigherThen(t *testing.T) {
+	// Connects to the database.
+	database := DatabaseInit(COLLECTION)
+
+	// Inserts 5 tracks to the database.
+	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{2, 12, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(Track{3, 13, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+	database.Insert(Track{4, 14, time.Now(), "pilot4", "glider4", "glider_id4", 20.4, "http://test4.test"})
+	database.Insert(Track{5, 15, time.Now(), "pilot5", "glider5", "glider_id5", 20.5, "http://test5.test"})
+
+	// The expected slice lenth to be returned, when querieng for
+	// timestamps higher then 13.
+	expected := 2
+
+	// All higher then 13
+	querie, _ := database.FindTrackHigherThen(13)
+	actual := len(querie)
+
+	if actual != expected {
+		t.Errorf("Method queried the DB wrong: got %d length want %d length of slice",
+			actual, expected)
+	}
+
+	// Deletes all from the database.
+	database.DeleteAllTracks()
+
+	// Closes the database session.
+	defer MDB.Session.Close()
+}
+
+// Function to test: SortTrackByTimestamp().
+// Test to check if the slice was sorted correctly.
+func Test_SortTrackByTimestamp(t *testing.T) {
+	// Connects the the database and inserts 3 tracks.
+	// The last inserted has the highest timestamp.
+	database := DatabaseInit(COLLECTION)
+	database.Insert(Track{1, 111, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(Track{2, 222, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(Track{3, 333, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+
+	// Returns all tracks from the DB.
+	tracks, _ := database.FindAll()
+
+	// Try to sort the slice.
+	sorted := SortTrackByTimestamp(tracks)
+
+	// The unsorted track should have the highest timestamp in index 2.
+	// The sorted track should have the highest timestamp in index 0.
+	if sorted[2].Timestamp > sorted[0].Timestamp {
+		t.Errorf("Function did not sort correctly")
+	}
+
+	// Removes the test data.
 	database.DeleteAllTracks()
 
 	// Closes the database session.

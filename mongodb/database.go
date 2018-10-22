@@ -7,6 +7,7 @@ package mongodb
 
 import (
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/globalsign/mgo"
@@ -16,7 +17,7 @@ import (
 // Track is the metadata about the track that will be stored in the database.
 type Track struct {
 	ID          int       `json:"-"`
-	Timestamp   int64     `json:"-"`
+	Timestamp   int64     `bson:"Timestamp"     json:"-"`
 	HDate       time.Time `bson:"H_date"        json:"H_date"`
 	Pilot       string    `bson:"pilot"         json:"pilot"`
 	Glider      string    `bson:"glider"        json:"glider"`
@@ -101,9 +102,28 @@ func (m *MongoDB) GetCount() (int, error) {
 // Returns a new ID that wil be used in the Track.
 func (m *MongoDB) GetNewID() int {
 	// For readability, mongoDB`s ID wil not be used.
-	// The new ID is simply the Count of all objects in the db + 1.
-	count, _ := MDB.C(m.Collection).Count()
-	return count + 1
+
+	// Gets all tracks from the DB.
+	tracks, err := m.FindAll()
+	if err != nil || tracks == nil {
+		// If there are no tracks. The new ID is 1.
+		return 1
+	}
+	// The newest track is now in index 0.
+	sorted := SortTrackByTimestamp(tracks)
+
+	// Generate the new ID.
+	return sorted[0].ID + 1
+}
+
+// Find all entries that have a higher timestamp than the parameter.
+func (m *MongoDB) FindTrackHigherThen(ts int64) ([]Track, error) {
+	var results []Track
+
+	// Queries the database.
+	err := MDB.C(m.Collection).Find(bson.M{"Timestamp": bson.M{"$gt": ts}}).All(&results)
+
+	return results, err
 }
 
 // DatabaseInit Initialises the database, and connects to it.
@@ -119,6 +139,20 @@ func DatabaseInit(coll string) MongoDB {
 	// Connects to the database and returns the struct.
 	database.Connect()
 	return database
+}
+
+// Takes a slice of Tracks, sorts them from newest to oldest (increasing), returns the sortet slice.
+func SortTrackByTimestamp(track []Track) []Track {
+	// The function works on a buffer.
+	buffer := append([]Track(nil), track...)
+
+	// Sorts the slice based on the Timestmap.
+	sort.Slice(buffer, func(i, j int) bool {
+		return buffer[i].Timestamp > buffer[j].Timestamp
+	})
+
+	// Returns the sorted track.
+	return buffer
 }
 
 // Generates a timestamp for a track.
