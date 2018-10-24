@@ -15,6 +15,7 @@ import (
 
 	igc "github.com/marni/goigc"
 	"github.com/mats93/paragliding/mongodb"
+	"github.com/mats93/paragliding/webhook"
 	"github.com/rickb777/date/period"
 )
 
@@ -130,6 +131,9 @@ func allTrackIDs(w http.ResponseWriter, r *http.Request) {
 // POST: Takes the post request as json format and inserts a new track to the DB.
 // Input/Output: application/json
 func insertNewTrack(w http.ResponseWriter, r *http.Request) {
+	// Sets the collection to be used in the webhook package.
+	webhook.CollectionTrack = Collection
+	webhook.CollectionWebhook = "Webhooks"
 	// Connects to the database.
 	database := mongodb.DatabaseInit(Collection)
 
@@ -178,6 +182,8 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 				trackFile.GliderID, sum, newURL.URL})
 
 			// Critical sector ends.
+			// Check if any webhooks needs to be notified of changes.
+			webhook.CheckWebhooks()
 
 			// Converts the id to json format by using the id struct and Marshaling the struct to json.
 			idStruct := id{newID}

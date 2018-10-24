@@ -106,7 +106,7 @@ func Test_GetLastTimestamp(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }
 
 // Function to test: GetLastTimestamp().
@@ -221,7 +221,7 @@ func Test_GetTimestamps(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }
 
 // Function to test: GetTimestampsNewerThen().
@@ -336,5 +336,5 @@ func Test_GetTimestampsNewerThen(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }

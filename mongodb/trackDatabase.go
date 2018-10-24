@@ -1,6 +1,6 @@
 /*
-	File: database.go
-  Handles the mongoDB operations.
+	File: trackDatabase.go
+  Handles the mongoDB operations for tracks.
 */
 
 package mongodb
@@ -58,7 +58,7 @@ func (m *MongoDB) Insert(t Track) error {
 }
 
 // Deletes all entries in the database collection.
-func (m *MongoDB) DeleteAllTracks() error {
+func (m *MongoDB) DeleteAll() error {
 	_, err := MDB.C(m.Collection).RemoveAll(bson.M{})
 	return err
 }

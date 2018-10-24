@@ -21,6 +21,7 @@ import (
 	"github.com/mats93/paragliding/admin"
 	"github.com/mats93/paragliding/ticker"
 	"github.com/mats93/paragliding/track"
+	"github.com/mats93/paragliding/webhook"
 )
 
 // COLLECTION is the collection to be used when the main app is running.
@@ -30,14 +31,15 @@ const COLLECTION = "Tracks"
 var startTime = time.Now()
 
 func main() {
-
 	// Injects the startime to the track package.
 	track.StartTime = startTime
 
 	// Injects the MongoDB collection to use.
 	track.Collection = COLLECTION
-	admin.Collection = COLLECTION
 	ticker.Collection = COLLECTION
+	admin.Collection = COLLECTION
+	webhook.CollectionTrack = COLLECTION
+	webhook.CollectionWebhook = "Webhooks"
 
 	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
@@ -55,10 +57,9 @@ func main() {
 	router.HandleFunc("/paragliding/api/ticker/", ticker.GetTimestamps)
 	router.HandleFunc("/paragliding/api/ticker/{timestamp:[0-9]+}", ticker.GetTimestampsNewerThen)
 
-	/* Webhook:
-	router.HandleFunc("/paragliding/api/webhook/new_track/", ) // POST
-	router.HandleFunc("/paragliding/api/webhook/new_track/<webhook_id>", ) GET og DELETE
-	*/
+	// Webhook:
+	router.HandleFunc("/paragliding/api/webhook/new_track/", webhook.NewWebhook) // POST
+	//router.HandleFunc("/paragliding/api/webhook/new_track/<webhook_id>", ) GET og DELETE
 
 	// Admin:
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
@@ -72,7 +73,7 @@ func main() {
 		port = "8080"
 	}
 
-	// Starts the web-application.
+	// Starts the API.
 	if err := http.ListenAndServe(":"+port, router); err != nil {
 		log.Fatal(err)
 	}

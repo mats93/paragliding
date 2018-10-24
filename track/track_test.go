@@ -178,7 +178,7 @@ func Test_HandleTracks(t *testing.T) {
 		}
 
 		// Removes the test data.
-		database.DeleteAllTracks()
+		database.DeleteAll()
 	}
 }
 
@@ -306,7 +306,7 @@ func Test_HandleTracks_POST(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }
 
 // Function to test: GetTrackByID().
@@ -384,7 +384,7 @@ func Test_GetTrackByID(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }
 
 // Function to test: GetDetailedTrack().
@@ -439,7 +439,7 @@ func Test_GetDetailedTrack_WrongField(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }
 
 // Function to test: GetDetailedTrack().
@@ -489,5 +489,5 @@ func Test_GetDetailedTrack(t *testing.T) {
 	}
 
 	// Removes the test data.
-	database.DeleteAllTracks()
+	database.DeleteAll()
 }
