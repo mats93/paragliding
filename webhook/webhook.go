@@ -25,11 +25,13 @@ type notifyMessage struct {
 	Processing    time.Duration `json:"processing"`
 }
 
-// The DB collections to use, gets injected from main or test.
+// CollectionTrack is the DB collections to use for tracks, gets injected from main or test.
 var CollectionTrack string
+
+// CollectionWebhook is the DB collections to use for webhooks, gets injected from main or test.
 var CollectionWebhook string
 
-// Checks if the registrated webhooks need to notify the subscrber.
+// CheckWebhooks checks if the registrated webhooks need to notify the subscrber.
 // This function should be called everytime a track is added.
 func CheckWebhooks() {
 	// Start time of the request.
@@ -242,10 +244,10 @@ func deleteWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// WebhookHandler - GET:    Get information about a given webhook.
-// WebhookHandler - DELETE: Delete a given webhook.
+// HandleWebhooks - GET:    Get information about a given webhook.
+// HandleWebhooks - DELETE: Delete a given webhook.
 // Output: application/json
-func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+func HandleWebhooks(w http.ResponseWriter, r *http.Request) {
 	// Calls functions to handle the GET and POST requests.
 	switch r.Method {
 	case "GET":

@@ -254,9 +254,9 @@ func Test_NewWebhook(t *testing.T) {
 	database.DeleteAll()
 }
 
-// Function to test: WebhookHandler()
+// Function to test: HandleWebhooks()
 // Test if correct error code is returned when wrong method is used.
-func Test_WebhookHandler(t *testing.T) {
+func Test_HandleWebhooks(t *testing.T) {
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("POST", "/paragliding/api/webhook/new_track/111", strings.NewReader("hello"))
 
@@ -265,7 +265,7 @@ func Test_WebhookHandler(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/webhook/new_track/111", WebhookHandler).Methods("POST")
+	router.HandleFunc("/paragliding/api/webhook/new_track/111", HandleWebhooks).Methods("POST")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (400).
@@ -321,7 +321,7 @@ func Test_getWebhookInfo(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc(requestPath, WebhookHandler).Methods("GET")
+	router.HandleFunc(requestPath, HandleWebhooks).Methods("GET")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -339,8 +339,8 @@ func Test_getWebhookInfo(t *testing.T) {
 	}
 
 	// Expected return data.
-	toJson, _ := json.Marshal(newHook)
-	expected := string(toJson)
+	toJSON, _ := json.Marshal(newHook)
+	expected := string(toJSON)
 
 	// The actual returned data.
 	actual := recorder.Body.String()
@@ -366,7 +366,7 @@ func Test_deleteWebhook_NoWebhook(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc("/paragliding/api/webhook/new_track/11", WebhookHandler).Methods("DELETE")
+	router.HandleFunc("/paragliding/api/webhook/new_track/11", HandleWebhooks).Methods("DELETE")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (404).
@@ -400,7 +400,7 @@ func Test_deleteWebhook(t *testing.T) {
 	router := mux.NewRouter()
 
 	// Tests the function.
-	router.HandleFunc(requestPath, WebhookHandler).Methods("DELETE")
+	router.HandleFunc(requestPath, HandleWebhooks).Methods("DELETE")
 	router.ServeHTTP(recorder, request)
 
 	// Check the status code is what we expect (200).
@@ -418,8 +418,8 @@ func Test_deleteWebhook(t *testing.T) {
 	}
 
 	// Expected return data.
-	toJson, _ := json.Marshal(newHook)
-	expected := string(toJson)
+	toJSON, _ := json.Marshal(newHook)
+	expected := string(toJSON)
 
 	// The actual returned data.
 	actual := recorder.Body.String()
