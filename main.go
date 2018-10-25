@@ -58,8 +58,8 @@ func main() {
 	router.HandleFunc("/paragliding/api/ticker/{timestamp:[0-9]+}", ticker.GetTimestampsNewerThen)
 
 	// Webhook:
-	router.HandleFunc("/paragliding/api/webhook/new_track/", webhook.NewWebhook) // POST
-	//router.HandleFunc("/paragliding/api/webhook/new_track/<webhook_id>", ) GET og DELETE
+	router.HandleFunc("/paragliding/api/webhook/new_track/", webhook.NewWebhook)
+	router.HandleFunc("/paragliding/api/webhook/new_track/{id:[a-z-A-Z-0-9]+}", webhook.WebhookHandler)
 
 	// Admin:
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
