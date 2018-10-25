@@ -1,16 +1,18 @@
-// Copyright 2016 Google Inc. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package s2
 
@@ -21,6 +23,124 @@ import (
 
 	"github.com/golang/geo/r1"
 	"github.com/golang/geo/r2"
+)
+
+// dimension defines the types of geometry dimensions that a Shape supports.
+type dimension int
+
+const (
+	pointGeometry dimension = iota
+	polylineGeometry
+	polygonGeometry
+)
+
+// Edge represents a geodesic edge consisting of two vertices. Zero-length edges are
+// allowed, and can be used to represent points.
+type Edge struct {
+	V0, V1 Point
+}
+
+// Cmp compares the two edges using the underlying Points Cmp method and returns
+//
+//   -1 if e <  other
+//    0 if e == other
+//   +1 if e >  other
+//
+// The two edges are compared by first vertex, and then by the second vertex.
+func (e Edge) Cmp(other Edge) int {
+	if v0cmp := e.V0.Cmp(other.V0.Vector); v0cmp != 0 {
+		return v0cmp
+	}
+	return e.V1.Cmp(other.V1.Vector)
+}
+
+// Chain represents a range of edge IDs corresponding to a chain of connected
+// edges, specified as a (start, length) pair. The chain is defined to consist of
+// edge IDs {start, start + 1, ..., start + length - 1}.
+type Chain struct {
+	Start, Length int
+}
+
+// ChainPosition represents the position of an edge within a given edge chain,
+// specified as a (chainID, offset) pair. Chains are numbered sequentially
+// starting from zero, and offsets are measured from the start of each chain.
+type ChainPosition struct {
+	ChainID, Offset int
+}
+
+// Shape defines an interface for any S2 type that needs to be indexable. A shape
+// is a collection of edges that optionally defines an interior. It can be used to
+// represent a set of points, a set of polylines, or a set of polygons.
+//
+// The edges of a Shape are indexed by a contiguous range of edge IDs
+// starting at 0. The edges are further subdivided into chains, where each
+// chain consists of a sequence of edges connected end-to-end (a polyline).
+// Shape has methods that allow edges to be accessed either using the global
+// numbering (edge ID) or within a particular chain. The global numbering is
+// sufficient for most purposes, but the chain representation is useful for
+// certain algorithms such as intersection (see BoundaryOperation).
+type Shape interface {
+	// NumEdges returns the number of edges in this shape.
+	NumEdges() int
+
+	// Edge returns the edge for the given edge index.
+	Edge(i int) Edge
+
+	// HasInterior reports whether this shape has an interior.
+	HasInterior() bool
+
+	// ContainsOrigin returns true if this shape contains s2.Origin.
+	// Shapes that do not have an interior will return false.
+	ContainsOrigin() bool
+
+	// NumChains reports the number of contiguous edge chains in the shape.
+	// For example, a shape whose edges are [AB, BC, CD, AE, EF] would consist
+	// of two chains (AB,BC,CD and AE,EF). Every chain is assigned a chain Id
+	// numbered sequentially starting from zero.
+	//
+	// Note that it is always acceptable to implement this method by returning
+	// NumEdges, i.e. every chain consists of a single edge, but this may
+	// reduce the efficiency of some algorithms.
+	NumChains() int
+
+	// Chain returns the range of edge IDs corresponding to the given edge chain.
+	// Edge chains must consist of contiguous, non-overlapping ranges that cover
+	// the entire range of edge IDs. This is spelled out more formally below:
+	//
+	//  0 <= i < NumChains()
+	//  Chain(i).length > 0, for all i
+	//  Chain(0).start == 0
+	//  Chain(i).start + Chain(i).length == Chain(i+1).start, for i < NumChains()-1
+	//  Chain(i).start + Chain(i).length == NumEdges(), for i == NumChains()-1
+	Chain(chainID int) Chain
+
+	// ChainEdgeReturns the edge at offset "offset" within edge chain "chainID".
+	// Equivalent to "shape.Edge(shape.Chain(chainID).start + offset)"
+	// but more efficient.
+	ChainEdge(chainID, offset int) Edge
+
+	// ChainPosition finds the chain containing the given edge, and returns the
+	// position of that edge as a ChainPosition(chainID, offset) pair.
+	//
+	//  shape.Chain(pos.chainID).start + pos.offset == edgeID
+	//  shape.Chain(pos.chainID+1).start > edgeID
+	//
+	// where pos == shape.ChainPosition(edgeID).
+	ChainPosition(edgeID int) ChainPosition
+
+	// dimension returns the dimension of the geometry represented by this shape.
+	//
+	// Note that this method allows degenerate geometry of different dimensions
+	// to be distinguished, e.g. it allows a point to be distinguished from a
+	// polyline or polygon that has been simplified to a single point.
+	dimension() dimension
+}
+
+// A minimal check for types that should satisfy the Shape interface.
+var (
+	_ Shape = &Loop{}
+	_ Shape = &Polygon{}
+	_ Shape = &Polyline{}
 )
 
 // CellRelation describes the possible relationships between a target cell
@@ -130,8 +250,6 @@ func (s *ShapeIndexCell) numEdges() int {
 
 // add adds the given clipped shape to this index cell.
 func (s *ShapeIndexCell) add(c *clippedShape) {
-	// C++ uses a set, so it's ordered and unique. We don't currently catch
-	// the case when a duplicate value is added.
 	s.shapes = append(s.shapes, c)
 }
 
@@ -170,7 +288,7 @@ type faceEdge struct {
 	shapeID     int32    // The ID of shape that this edge belongs to
 	edgeID      int      // Edge ID within that shape
 	maxLevel    int      // Not desirable to subdivide this edge beyond this level
-	hasInterior bool     // Belongs to a shape that has a dimension of 2
+	hasInterior bool     // Belongs to a shape that has an interior
 	a, b        r2.Point // The edge endpoints, clipped to a given face
 	edge        Edge     // The original edge.
 }
@@ -180,18 +298,6 @@ type clippedEdge struct {
 	faceEdge *faceEdge // The original unclipped edge
 	bound    r2.Rect   // Bounding box for the clipped portion
 }
-
-// ShapeIndexIteratorPos defines the set of possible iterator starting positions. By
-// default iterators are unpositioned, since this avoids an extra seek in this
-// situation where one of the seek methods (such as Locate) is immediately called.
-type ShapeIndexIteratorPos int
-
-const (
-	// IteratorBegin specifies the iterator should be positioned at the beginning of the index.
-	IteratorBegin ShapeIndexIteratorPos = iota
-	// IteratorEnd specifies the iterator should be positioned at the end of the index.
-	IteratorEnd
-)
 
 // ShapeIndexIterator is an iterator that provides low-level access to
 // the cells of the index. Cells are returned in increasing order of CellID.
@@ -203,46 +309,19 @@ const (
 type ShapeIndexIterator struct {
 	index    *ShapeIndex
 	position int
-	id       CellID
-	cell     *ShapeIndexCell
 }
 
-// NewShapeIndexIterator creates a new iterator for the given index. If a starting
-// position is specified, the iterator is positioned at the given spot.
-func NewShapeIndexIterator(index *ShapeIndex, pos ...ShapeIndexIteratorPos) *ShapeIndexIterator {
-	s := &ShapeIndexIterator{
-		index: index,
-	}
-
-	if len(pos) > 0 {
-		if len(pos) > 1 {
-			panic("too many ShapeIndexIteratorPos arguments")
-		}
-		switch pos[0] {
-		case IteratorBegin:
-			s.Begin()
-		case IteratorEnd:
-			s.End()
-		default:
-			panic("unknown ShapeIndexIteratorPos value")
-		}
-	}
-
-	return s
-}
-
-// CellID returns the CellID of the current index cell.
-// If s.Done() is true, a value larger than any valid CellID is returned.
+// CellID returns the CellID of the cell at the current position of the iterator.
 func (s *ShapeIndexIterator) CellID() CellID {
-	return s.id
+	if s.position >= len(s.index.cells) {
+		return 0
+	}
+	return s.index.cells[s.position]
 }
 
-// IndexCell returns the current index cell.
+// IndexCell returns the ShapeIndexCell at the current position of the iterator.
 func (s *ShapeIndexIterator) IndexCell() *ShapeIndexCell {
-	// TODO(roberts): C++ has this call a virtual method to allow subclasses
-	// of ShapeIndexIterator to do other work before returning the cell. Do
-	// we need such a thing?
-	return s.cell
+	return s.index.cellMap[s.CellID()]
 }
 
 // Center returns the Point at the center of the current position of the iterator.
@@ -250,60 +329,41 @@ func (s *ShapeIndexIterator) Center() Point {
 	return s.CellID().Point()
 }
 
-// Begin positions the iterator at the beginning of the index.
-func (s *ShapeIndexIterator) Begin() {
+// Reset the iterator to be positioned at the first cell in the index.
+func (s *ShapeIndexIterator) Reset() {
 	if !s.index.IsFresh() {
 		s.index.maybeApplyUpdates()
 	}
 	s.position = 0
-	s.refresh()
 }
 
-// Next positions the iterator at the next index cell.
+// AtBegin reports if the iterator is positioned at the first index cell.
+func (s *ShapeIndexIterator) AtBegin() bool {
+	return s.position == 0
+}
+
+// Next advances the iterator to the next cell in the index.
 func (s *ShapeIndexIterator) Next() {
 	s.position++
-	s.refresh()
 }
 
-// Prev advances the iterator to the previous cell in the index and returns true to
-// indicate it was not yet at the beginning of the index. If the iterator is at the
-// first cell the call does nothing and returns false.
-func (s *ShapeIndexIterator) Prev() bool {
-	if s.position <= 0 {
-		return false
+// Prev advances the iterator to the previous cell in the index.
+// If the iterator is at the first cell the call does nothing.
+func (s *ShapeIndexIterator) Prev() {
+	if s.position > 0 {
+		s.position--
 	}
-
-	s.position--
-	s.refresh()
-	return true
-}
-
-// End positions the iterator at the end of the index.
-func (s *ShapeIndexIterator) End() {
-	s.position = len(s.index.cells)
-	s.refresh()
 }
 
 // Done reports if the iterator is positioned at or after the last index cell.
 func (s *ShapeIndexIterator) Done() bool {
-	return s.id == SentinelCellID
+	return s.position >= len(s.index.cells)
 }
 
-// refresh updates the stored internal iterator values.
-func (s *ShapeIndexIterator) refresh() {
-	if s.position < len(s.index.cells) {
-		s.id = s.index.cells[s.position]
-		s.cell = s.index.cellMap[s.CellID()]
-	} else {
-		s.id = SentinelCellID
-		s.cell = nil
-	}
-}
-
-// seek positions the iterator at the first cell whose ID >= target, or at the
-// end of the index if no such cell exists.
+// seek positions the iterator at the first cell whose ID >= target starting from the
+// current position of the iterator, or at the end of the index if no such cell exists.
+// If the iterator is currently at the end, nothing is done.
 func (s *ShapeIndexIterator) seek(target CellID) {
-	s.position = 0
 	// In C++, this relies on the lower_bound method of the underlying btree_map.
 	// TODO(roberts): Convert this to a binary search since the list of cells is ordered.
 	for k, v := range s.index.cells {
@@ -315,7 +375,14 @@ func (s *ShapeIndexIterator) seek(target CellID) {
 		// Otherwise, advance the position.
 		s.position++
 	}
-	s.refresh()
+}
+
+// seekForward advances the iterator to the next cell with cellID >= target if the
+// iterator is not Done or already satisfies the condition.
+func (s *ShapeIndexIterator) seekForward(target CellID) {
+	if !s.Done() && s.CellID() < target {
+		s.seek(target)
+	}
 }
 
 // LocatePoint positions the iterator at the cell that contains the given Point.
@@ -333,17 +400,20 @@ func (s *ShapeIndexIterator) LocatePoint(p Point) bool {
 		return true
 	}
 
-	if s.Prev() && s.CellID().RangeMax() >= target {
-		return true
+	if !s.AtBegin() {
+		s.Prev()
+		if s.CellID().RangeMax() >= target {
+			return true
+		}
 	}
 	return false
 }
 
-// LocateCellID attempts to position the iterator at the first matching index cell
+// LocateCellID attempts to position the iterator at the first matching indexCell
 // in the index that has some relation to the given CellID. Let T be the target CellID.
 // If T is contained by (or equal to) some index cell I, then the iterator is positioned
 // at I and returns Indexed. Otherwise if T contains one or more (smaller) index cells,
-// then the iterator is positioned at the first such cell I and return Subdivided.
+// then position the iterator at the first such cell I and return Subdivided.
 // Otherwise Disjoint is returned and the iterator position is undefined.
 func (s *ShapeIndexIterator) LocateCellID(target CellID) CellRelation {
 	// Let T be the target, let I = cellMap.LowerBound(T.RangeMin()), and
@@ -360,8 +430,11 @@ func (s *ShapeIndexIterator) LocateCellID(target CellID) CellRelation {
 			return Subdivided
 		}
 	}
-	if s.Prev() && s.CellID().RangeMax() >= target {
-		return Indexed
+	if !s.AtBegin() {
+		s.Prev()
+		if s.CellID().RangeMax() >= target {
+			return Indexed
+		}
 	}
 	return Disjoint
 }
@@ -372,17 +445,21 @@ func (s *ShapeIndexIterator) LocateCellID(target CellID) CellRelation {
 // this to compute which shapes contain the center of every CellID in the index,
 // by advancing the focus from one cell center to the next.
 //
-// Initially the focus is at the start of the CellID space-filling curve. We then
-// visit all the cells that are being added to the ShapeIndex in increasing order
-// of CellID. For each cell, we draw two edges: one from the entry vertex to the
-// center, and another from the center to the exit vertex (where entry and exit
-// refer to the points where the space-filling curve enters and exits the cell).
-// By counting edge crossings we can incrementally compute which shapes contain
-// the cell center. Note that the same set of shapes will always contain the exit
-// point of one cell and the entry point of the next cell in the index, because
-// either (a) these two points are actually the same, or (b) the intervening
-// cells in CellID order are all empty, and therefore there are no edge crossings
-// if we follow this path from one cell to the other.
+// Initially the focus is OriginPoint, and therefore we can initialize the
+// state of every shape to its ContainsOrigin value. Next we advance the
+// focus to the start of the CellID space-filling curve, by drawing a line
+// segment between this point and OriginPoint and testing whether every edge
+// of every shape intersects it. Then we visit all the cells that are being
+// added to the ShapeIndex in increasing order of CellID. For each cell,
+// we draw two edges: one from the entry vertex to the center, and another
+// from the center to the exit vertex (where entry and exit refer to the
+// points where the space-filling curve enters and exits the cell). By
+// counting edge crossings we can incrementally compute which shapes contain
+// the cell center. Note that the same set of shapes will always contain the
+// exit point of one cell and the entry point of the next cell in the index,
+// because either (a) these two points are actually the same, or (b) the
+// intervening cells in CellID order are all empty, and therefore there are
+// no edge crossings if we follow this path from one cell to the other.
 //
 // In C++, this is S2ShapeIndex::InteriorTracker.
 type tracker struct {
@@ -405,23 +482,13 @@ func newTracker() *tracker {
 	// point and counting how many shape edges cross this edge.
 	t := &tracker{
 		isActive:   false,
-		b:          trackerOrigin(),
+		b:          OriginPoint(),
 		nextCellID: CellIDFromFace(0).ChildBeginAtLevel(maxLevel),
 	}
 	t.drawTo(Point{faceUVToXYZ(0, -1, -1).Normalize()}) // CellID curve start
 
 	return t
 }
-
-// trackerOrigin returns the initial focus point when the tracker is created
-// (corresponding to the start of the CellID space-filling curve).
-func trackerOrigin() Point {
-	// The start of the S2CellId space-filling curve.
-	return Point{faceUVToXYZ(0, -1, -1).Normalize()}
-}
-
-// focus returns the current focus point of the tracker.
-func (t *tracker) focus() Point { return t.b }
 
 // addShape adds a shape whose interior should be tracked. containsOrigin indicates
 // whether the current focus point is inside the shape. Alternatively, if
@@ -431,9 +498,9 @@ func (t *tracker) focus() Point { return t.b }
 // This updates the state to correspond to the new focus point.
 //
 // This requires shape.HasInterior
-func (t *tracker) addShape(shapeID int32, containsFocus bool) {
+func (t *tracker) addShape(shapeID int32, containsOrigin bool) {
 	t.isActive = true
-	if containsFocus {
+	if containsOrigin {
 		t.toggleShape(shapeID)
 	}
 }
@@ -540,10 +607,10 @@ func (t *tracker) lowerBound(shapeID int32) int32 {
 
 // removedShape represents a set of edges from the given shape that is queued for removal.
 type removedShape struct {
-	shapeID               int32
-	hasInterior           bool
-	containsTrackerOrigin bool
-	edges                 []Edge
+	shapeID        int32
+	hasInterior    bool
+	containsOrigin bool
+	edges          []Edge
 }
 
 // There are three basic states the index can be in.
@@ -641,13 +708,13 @@ func NewShapeIndex() *ShapeIndex {
 // Iterator returns an iterator for this index.
 func (s *ShapeIndex) Iterator() *ShapeIndexIterator {
 	s.maybeApplyUpdates()
-	return NewShapeIndexIterator(s, IteratorBegin)
+	return &ShapeIndexIterator{index: s}
 }
 
 // Begin positions the iterator at the first cell in the index.
 func (s *ShapeIndex) Begin() *ShapeIndexIterator {
 	s.maybeApplyUpdates()
-	return NewShapeIndexIterator(s, IteratorBegin)
+	return &ShapeIndexIterator{index: s}
 }
 
 // End positions the iterator at the last cell in the index.
@@ -657,7 +724,10 @@ func (s *ShapeIndex) End() *ShapeIndexIterator {
 	// will be invalid or not the end. For now, things will be undefined if this
 	// happens. See about referencing the IsFresh to guard for this in the future.
 	s.maybeApplyUpdates()
-	return NewShapeIndexIterator(s, IteratorEnd)
+	return &ShapeIndexIterator{
+		index:    s,
+		position: len(s.cells),
+	}
 }
 
 // Len reports the number of Shapes in this index.
@@ -683,60 +753,27 @@ func (s *ShapeIndex) NumEdges() int {
 	return numEdges
 }
 
-// NumEdgesUpTo returns the number of edges in the given index, up to the given
-// limit. If the limit is encountered, the current running total is returned,
-// which may be more than the limit.
-func (s *ShapeIndex) NumEdgesUpTo(limit int) int {
-	var numEdges int
-	// We choose to iterate over the shapes in order to match the counting
-	// up behavior in C++ and for test compatibility instead of using a
-	// more idiomatic range over the shape map.
-	for i := int32(0); i <= s.nextID; i++ {
-		s := s.Shape(i)
-		if s == nil {
-			continue
-		}
-		numEdges += s.NumEdges()
-		if numEdges >= limit {
-			break
-		}
-	}
-
-	return numEdges
-}
-
 // Shape returns the shape with the given ID, or nil if the shape has been removed from the index.
 func (s *ShapeIndex) Shape(id int32) Shape { return s.shapes[id] }
 
-// idForShape returns the id of the given shape in this index, or -1 if it is
-// not in the index.
-//
-// TODO(roberts): Need to figure out an appropriate way to expose this on a Shape.
-// C++ allows a given S2 type (Loop, Polygon, etc) to be part of multiple indexes.
-// By having each type extend S2Shape which has an id element, they all inherit their
-// own id field rather than having to track it themselves.
-func (s *ShapeIndex) idForShape(shape Shape) int32 {
-	for k, v := range s.shapes {
-		if v == shape {
-			return k
-		}
-	}
-	return -1
-}
-
-// Add adds the given shape to the index and returns the assigned ID..
-func (s *ShapeIndex) Add(shape Shape) int32 {
+// Add adds the given shape to the index.
+func (s *ShapeIndex) Add(shape Shape) {
 	s.shapes[s.nextID] = shape
 	s.nextID++
 	atomic.StoreInt32(&s.status, stale)
-	return s.nextID - 1
 }
 
 // Remove removes the given shape from the index.
 func (s *ShapeIndex) Remove(shape Shape) {
 	// The index updates itself lazily because it is much more efficient to
 	// process additions and removals in batches.
-	id := s.idForShape(shape)
+	// Lookup the id of this shape in the index.
+	id := int32(-1)
+	for k, v := range s.shapes {
+		if v == shape {
+			id = k
+		}
+	}
 
 	// If the shape wasn't found, it's already been removed or was not in the index.
 	if s.shapes[id] == nil {
@@ -754,10 +791,10 @@ func (s *ShapeIndex) Remove(shape Shape) {
 
 	numEdges := shape.NumEdges()
 	removed := &removedShape{
-		shapeID:               id,
-		hasInterior:           shape.Dimension() == 2,
-		containsTrackerOrigin: shape.ReferencePoint().Contained,
-		edges:                 make([]Edge, numEdges),
+		shapeID:        id,
+		hasInterior:    shape.HasInterior(),
+		containsOrigin: shape.ContainsOrigin(),
+		edges:          make([]Edge, numEdges),
 	}
 
 	for e := 0; e < numEdges; e++ {
@@ -803,7 +840,6 @@ func (s *ShapeIndex) maybeApplyUpdates() {
 	if atomic.LoadInt32(&s.status) != fresh {
 		s.mu.Lock()
 		s.applyUpdatesInternal()
-		atomic.StoreInt32(&s.status, fresh)
 		s.mu.Unlock()
 	}
 }
@@ -834,7 +870,7 @@ func (s *ShapeIndex) applyUpdatesInternal() {
 
 	s.pendingRemovals = s.pendingRemovals[:0]
 	s.pendingAdditionsPos = int32(len(s.shapes))
-	// It is the caller's responsibility to update the index status.
+	// It is the caller's responsibility to update index_status_.
 }
 
 // addShapeInternal clips all edges of the given shape to the six cube faces,
@@ -849,11 +885,11 @@ func (s *ShapeIndex) addShapeInternal(shapeID int32, allEdges [][]faceEdge, t *t
 
 	faceEdge := faceEdge{
 		shapeID:     shapeID,
-		hasInterior: shape.Dimension() == 2,
+		hasInterior: shape.HasInterior(),
 	}
 
 	if faceEdge.hasInterior {
-		t.addShape(shapeID, containsBruteForce(shape, t.focus()))
+		t.addShape(shapeID, shape.ContainsOrigin())
 	}
 
 	numEdges := shape.NumEdges()
@@ -863,6 +899,10 @@ func (s *ShapeIndex) addShapeInternal(shapeID int32, allEdges [][]faceEdge, t *t
 		faceEdge.edgeID = e
 		faceEdge.edge = edge
 		faceEdge.maxLevel = maxLevelForEdge(edge)
+
+		if faceEdge.hasInterior {
+			t.testEdge(shapeID, faceEdge.edge)
+		}
 		s.addFaceEdge(faceEdge, allEdges)
 	}
 }
@@ -1193,7 +1233,7 @@ func (s *ShapeIndex) makeIndexCell(p *PaddedCell, edges []*clippedEdge, t *track
 		if eNext != len(edges) {
 			eshapeID = edges[eNext].faceEdge.shapeID
 		}
-		if cNextIdx < len(cshapeIDs) {
+		if cNextIdx != len(cshapeIDs) {
 			cshapeID = cshapeIDs[cNextIdx]
 		}
 		eBegin := eNext
@@ -1398,7 +1438,7 @@ func (s *ShapeIndex) absorbIndexCell(p *PaddedCell, iter *ShapeIndexIterator, ed
 		// line segment from the cell center to the entry vertex.
 		edge := &faceEdge{
 			shapeID:     shapeID,
-			hasInterior: shape.Dimension() == 2,
+			hasInterior: shape.HasInterior(),
 		}
 
 		if edge.hasInterior {
@@ -1468,14 +1508,10 @@ func (s *ShapeIndex) testAllEdges(edges []*clippedEdge, t *tracker) {
 func (s *ShapeIndex) countShapes(edges []*clippedEdge, shapeIDs []int32) int {
 	count := 0
 	lastShapeID := int32(-1)
-
-	// next clipped shape id in the shapeIDs list.
-	clippedNext := int32(0)
-	// index of the current element in the shapeIDs list.
-	shapeIDidx := 0
+	cNext := int32(0)
 	for _, edge := range edges {
 		if edge.faceEdge.shapeID == lastShapeID {
-			continue
+			break
 		}
 
 		count++
@@ -1483,19 +1519,18 @@ func (s *ShapeIndex) countShapes(edges []*clippedEdge, shapeIDs []int32) int {
 
 		// Skip over any containing shapes up to and including this one,
 		// updating count as appropriate.
-		for ; shapeIDidx < len(shapeIDs); shapeIDidx++ {
-			clippedNext = shapeIDs[shapeIDidx]
-			if clippedNext > lastShapeID {
+		for ; cNext < int32(len(shapeIDs)); cNext++ {
+			if cNext > lastShapeID {
 				break
 			}
-			if clippedNext < lastShapeID {
+			if cNext < lastShapeID {
 				count++
 			}
 		}
 	}
 
 	// Count any remaining containing shapes.
-	count += int(len(shapeIDs)) - int(shapeIDidx)
+	count += int(len(shapeIDs) - int(cNext))
 	return count
 }
 

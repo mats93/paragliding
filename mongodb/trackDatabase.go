@@ -26,7 +26,7 @@ type Track struct {
 	TrackSrcURL string    `bson:"track_src_url" json:"track_src_url"`
 }
 
-// DatabaseMGO holds the database information.
+// MongoDB - holds the database information.
 type MongoDB struct {
 	Server     string
 	Database   string
@@ -35,7 +35,7 @@ type MongoDB struct {
 	Password   string
 }
 
-// The database that connected.
+// MDB is the database that connected.
 var MDB *mgo.Database
 
 // Connect to the database.
@@ -57,13 +57,13 @@ func (m *MongoDB) Insert(t Track) error {
 	return err
 }
 
-// Deletes all entries in the database collection.
+// DeleteAll deletes all entries in the database collection.
 func (m *MongoDB) DeleteAll() error {
 	_, err := MDB.C(m.Collection).RemoveAll(bson.M{})
 	return err
 }
 
-// Find all entries in the collection.
+// FindAll finds all entries in the collection.
 func (m *MongoDB) FindAll() ([]Track, error) {
 	var results []Track
 
@@ -74,7 +74,7 @@ func (m *MongoDB) FindAll() ([]Track, error) {
 	return results, err
 }
 
-// Find entry by ID.
+// FindByID finds entry by ID.
 func (m *MongoDB) FindByID(id int) ([]Track, error) {
 	var result []Track
 
@@ -89,7 +89,7 @@ func (m *MongoDB) FindByID(id int) ([]Track, error) {
 	return result, err
 }
 
-// Get a count of all tracks in the database.
+// GetCount gets the count of all tracks in the database.
 func (m *MongoDB) GetCount() (int, error) {
 	count, err := MDB.C(m.Collection).Count()
 	if err != nil {
@@ -99,7 +99,7 @@ func (m *MongoDB) GetCount() (int, error) {
 	return count, nil
 }
 
-// Returns a new ID that wil be used in the Track.
+// GetNewID returns a new ID that wil be used in the Track.
 func (m *MongoDB) GetNewID() int {
 	// For readability, mongoDB`s ID wil not be used.
 
@@ -116,7 +116,7 @@ func (m *MongoDB) GetNewID() int {
 	return sorted[0].ID + 1
 }
 
-// Find all entries that have a higher timestamp than the parameter.
+// FindTrackHigherThen finds all entries that have a higher timestamp than the parameter.
 func (m *MongoDB) FindTrackHigherThen(ts int64) ([]Track, error) {
 	var results []Track
 
@@ -141,7 +141,7 @@ func DatabaseInit(coll string) MongoDB {
 	return database
 }
 
-// Takes a slice of Tracks, sorts them from newest to oldest (increasing), returns the sortet slice.
+// SortTrackByTimestamp takes a slice of Tracks, sorts them from newest to oldest (increasing), returns the sortet slice.
 func SortTrackByTimestamp(track []Track) []Track {
 	// The function works on a buffer.
 	buffer := append([]Track(nil), track...)
@@ -155,7 +155,7 @@ func SortTrackByTimestamp(track []Track) []Track {
 	return buffer
 }
 
-// Generates a timestamp for a track.
+// GenerateTimestamp creates a timestamp for a track.
 // The function is monothonic, it wil always count up.
 func GenerateTimestamp() int64 {
 	// Current time.

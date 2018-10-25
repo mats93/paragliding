@@ -77,23 +77,32 @@ DELETE: /paragliding/api/webhook/new_track/<webhook_id>  - Deleting registered w
 ## Application testing
 
 ### Static code analysis:
-- [ ] go build
-- [ ] go tool vet
-- [ ] go fmt
-- [ ] golint
-- [ ] gometalinter
+Done for each folder/package:
+- [x] go build     (go build .)
+- [x] go fmt       (go fmt .)
+- [x] golint       (golint .)
+- [x] go tool vet  (go tool vet .)
+- [x] gometalinter (gometalinter -- metalinter .)
+
+Warnings & errors:
+```
+'go tool vet .' complained that it could not find packages, yet the program finds them when running.
+
+'gometalinter -- metalinter .' complains about the same as 'go tool vet', but also about errors in
+other packages such as the mgo package.
+```
 
 ### Unit test coverage:
- * admin   - x%
- * mongodb - x%
- * ticker  - x%
- * track   - x%
- * webhook - x%
+ * admin   - 76.0%
+ * mongodb - 87.9%
+ * ticker  - 91.0%
+ * track   - 84.9%
+ * webhook - 57.5%
 
 ***
 
 ## Additional information:
 
-[Link to the task details Temp](https://google.com)
+[Link to the task details](https://github.com/mats93/paragliding/blob/testing/TaskDetails.md)
 
 Created by Mats Ove Mandt Skjærstein, 2018

@@ -13,10 +13,10 @@ import (
 	"github.com/mats93/paragliding/mongodb"
 )
 
-// The MongoDB collection to use. Gets injected from main or test.
+// Collection is the MongoDB collection to use. Gets injected from main or test.
 var Collection string
 
-// GET: Returns the current count of all tracks in the DB.
+// GetTrackCount - GET: Returns the current count of all tracks in the DB.
 // Output: text/plain
 func GetTrackCount(w http.ResponseWriter, r *http.Request) {
 	// Connects to the database.
@@ -40,7 +40,7 @@ func GetTrackCount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// DELETE: Deletes all tracks in the DB.
+// DeleteAllTracks - DELETE: Deletes all tracks in the DB.
 // Output: text/plain
 func DeleteAllTracks(w http.ResponseWriter, r *http.Request) {
 	// Only allow DELETE method.

@@ -189,35 +189,35 @@ func Test_GetTimestamps(t *testing.T) {
 	}
 
 	// Expected timestamp to be returned.
-	expectedLatestJson := "{\"t_latest\":333"
-	expectedStartJson := "\"t_start\":333"
-	expectedStopJson := "\"t_stop\":111"
-	expectedIDsJson := "\"tracks\":[1"
+	expectedLatestJSON := "{\"t_latest\":333"
+	expectedStartJSON := "\"t_start\":333"
+	expectedStopJSON := "\"t_stop\":111"
+	expectedIDsJSON := "\"tracks\":[1"
 
 	// The actual retuned data.
 	// Dont want to compare against processing. Splits the json and compers with it.
 	actual := recorder.Body.String()
 	actualSplit := strings.Split(actual, ",")
-	actualLatestJson := actualSplit[0]
-	actualStartJson := actualSplit[1]
-	actualStopJson := actualSplit[2]
-	actualIDsJson := actualSplit[3]
+	actualLatestJSON := actualSplit[0]
+	actualStartJSON := actualSplit[1]
+	actualStopJSON := actualSplit[2]
+	actualIDsJSON := actualSplit[3]
 
-	if actualLatestJson != expectedLatestJson {
+	if actualLatestJSON != expectedLatestJSON {
 		t.Errorf("Function returned wrong Latest field: got %s want %s",
-			actualLatestJson, expectedLatestJson)
+			actualLatestJSON, expectedLatestJSON)
 	}
-	if actualStartJson != expectedStartJson {
+	if actualStartJSON != expectedStartJSON {
 		t.Errorf("Function returned wrong Start field: got %s want %s",
-			actualStartJson, expectedStartJson)
+			actualStartJSON, expectedStartJSON)
 	}
-	if actualStopJson != expectedStopJson {
+	if actualStopJSON != expectedStopJSON {
 		t.Errorf("Function returned wrong Stop field: got %s want %s",
-			actualStopJson, expectedStopJson)
+			actualStopJSON, expectedStopJSON)
 	}
-	if actualIDsJson != expectedIDsJson {
+	if actualIDsJSON != expectedIDsJSON {
 		t.Errorf("Function returned wrong IDs field: got %s want %s",
-			actualIDsJson, expectedIDsJson)
+			actualIDsJSON, expectedIDsJSON)
 	}
 
 	// Removes the test data.
@@ -304,35 +304,35 @@ func Test_GetTimestampsNewerThen(t *testing.T) {
 	}
 
 	// Expected timestamp to be returned.
-	expectedLatestJson := "{\"t_latest\":333"
-	expectedStartJson := "\"t_start\":333"
-	expectedStopJson := "\"t_stop\":333"
-	expectedIDsJson := "\"tracks\":[3]"
+	expectedLatestJSON := "{\"t_latest\":333"
+	expectedStartJSON := "\"t_start\":333"
+	expectedStopJSON := "\"t_stop\":333"
+	expectedIDsJSON := "\"tracks\":[3]"
 
 	// The actual retuned data.
 	// Dont want to compare against processing. Splits the json and compers with it.
 	actual := recorder.Body.String()
 	actualSplit := strings.Split(actual, ",")
-	actualLatestJson := actualSplit[0]
-	actualStartJson := actualSplit[1]
-	actualStopJson := actualSplit[2]
-	actualIDsJson := actualSplit[3]
+	actualLatestJSON := actualSplit[0]
+	actualStartJSON := actualSplit[1]
+	actualStopJSON := actualSplit[2]
+	actualIDsJSON := actualSplit[3]
 
-	if actualLatestJson != expectedLatestJson {
+	if actualLatestJSON != expectedLatestJSON {
 		t.Errorf("Function returned wrong Latest field: got %s want %s",
-			actualLatestJson, expectedLatestJson)
+			actualLatestJSON, expectedLatestJSON)
 	}
-	if actualStartJson != expectedStartJson {
+	if actualStartJSON != expectedStartJSON {
 		t.Errorf("Function returned wrong Start field: got %s want %s",
-			actualStartJson, expectedStartJson)
+			actualStartJSON, expectedStartJSON)
 	}
-	if actualStopJson != expectedStopJson {
+	if actualStopJSON != expectedStopJSON {
 		t.Errorf("Function returned wrong Stop field: got %s want %s",
-			actualStopJson, expectedStopJson)
+			actualStopJSON, expectedStopJSON)
 	}
-	if actualIDsJson != expectedIDsJson {
+	if actualIDsJSON != expectedIDsJSON {
 		t.Errorf("Function returned wrong IDs field: got %s want %s",
-			actualIDsJson, expectedIDsJson)
+			actualIDsJSON, expectedIDsJSON)
 	}
 
 	// Removes the test data.

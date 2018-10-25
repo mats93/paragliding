@@ -1,16 +1,18 @@
-// Copyright 2014 Google Inc. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package r1
 
@@ -59,7 +61,7 @@ func (i Interval) ContainsInterval(oi Interval) bool {
 	return i.Lo <= oi.Lo && oi.Hi <= i.Hi
 }
 
-// InteriorContains returns true iff the interval strictly contains p.
+// InteriorContains returns true iff the the interval strictly contains p.
 func (i Interval) InteriorContains(p float64) bool {
 	return i.Lo < p && p < i.Hi
 }
@@ -138,14 +140,9 @@ func (i Interval) Union(other Interval) Interval {
 
 func (i Interval) String() string { return fmt.Sprintf("[%.7f, %.7f]", i.Lo, i.Hi) }
 
-const (
-	// epsilon is a small number that represents a reasonable level of noise between two
-	// values that can be considered to be equal.
-	epsilon = 1e-15
-	// dblEpsilon is a smaller number for values that require more precision.
-	// This is the C++ DBL_EPSILON equivalent.
-	dblEpsilon = 2.220446049250313e-16
-)
+// epsilon is a small number that represents a reasonable level of noise between two
+// values that can be considered to be equal.
+const epsilon = 1e-14
 
 // ApproxEqual reports whether the interval can be transformed into the
 // given interval by moving each endpoint a small distance.

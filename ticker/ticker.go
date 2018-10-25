@@ -16,7 +16,7 @@ import (
 	"github.com/mats93/paragliding/mongodb"
 )
 
-// Emulates paging of 5.
+// CAP emulates paging of 5.
 const CAP = 5
 
 // Timestamp struct.

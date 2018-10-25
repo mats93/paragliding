@@ -59,7 +59,7 @@ func main() {
 
 	// Webhook:
 	router.HandleFunc("/paragliding/api/webhook/new_track/", webhook.NewWebhook)
-	router.HandleFunc("/paragliding/api/webhook/new_track/{id:[a-z-A-Z-0-9]+}", webhook.WebhookHandler)
+	router.HandleFunc("/paragliding/api/webhook/new_track/{id:[a-z-A-Z-0-9]+}", webhook.HandleWebhooks)
 
 	// Admin:
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
