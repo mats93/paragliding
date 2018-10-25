@@ -64,7 +64,6 @@ func main() {
 	// Admin:
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
 	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks)
-	router.HandleFunc("/paragliding/admin/api/insert", admin.InsertSomeTracks) // ToDo: Remove this.
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")

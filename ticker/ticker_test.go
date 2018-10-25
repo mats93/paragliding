@@ -20,7 +20,7 @@ import (
 // Test to check the returned status code, content-type and data for the function, when the DB is empty.
 func Test_GetLastTimestamp_Empty(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/ticker/latest", nil)
 
@@ -61,7 +61,7 @@ func Test_GetLastTimestamp_Empty(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetLastTimestamp(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database and inserts 3 tracks.
 	database := mongodb.DatabaseInit(Collection)
@@ -113,7 +113,7 @@ func Test_GetLastTimestamp(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function, when the DB is empty.
 func Test_GetTimestamps_Empty(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/ticker/", nil)
@@ -155,7 +155,7 @@ func Test_GetTimestamps_Empty(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetTimestamps(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database and inserts 3 tracks.
 	database := mongodb.DatabaseInit(Collection)
@@ -228,7 +228,7 @@ func Test_GetTimestamps(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function, when the DB is empty.
 func Test_GetTimestampsNewerThen_Empty(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/api/ticker/1", nil)
@@ -270,7 +270,7 @@ func Test_GetTimestampsNewerThen_Empty(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetTimestampsNewerThen(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database and inserts 3 tracks.
 	database := mongodb.DatabaseInit(Collection)

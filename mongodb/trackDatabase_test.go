@@ -14,7 +14,7 @@ import (
 // Test if the correct track is insertet into the database.
 func Test_Insert(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	expected := Track{100, 10, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"}
 
@@ -38,11 +38,11 @@ func Test_Insert(t *testing.T) {
 	defer MDB.Session.Close()
 }
 
-// Method to test: DeleteAllTracks().
+// Method to test: DeleteAll().
 // Test if all inserted tracks was deleted from the database.
-func Test_DeleteAllTracks(t *testing.T) {
+func Test_DeleteAll(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// Expected count when all 5 tracks are deleted.
 	expected := 0
@@ -72,7 +72,7 @@ func Test_DeleteAllTracks(t *testing.T) {
 // Test if an empty Track is returned when collection is empty.
 func Test_FindAll_Empty(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// Check if the correct track slice is returned (nil).
 	actual, _ := database.FindAll()
@@ -90,7 +90,7 @@ func Test_FindAll_Empty(t *testing.T) {
 // Test if the correct tracks are returned from the database.
 func Test_FindAll(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// Expected results from the database.
 	var expected []Track
@@ -155,7 +155,7 @@ func Test_FindAll(t *testing.T) {
 // Test the error message when the collection is empty.
 func Test_FindByID_Empty(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	_, err := database.FindByID(1)
 	if err == nil {
@@ -171,7 +171,7 @@ func Test_FindByID_Empty(t *testing.T) {
 // Test if the correct track is returned from the database.
 func Test_FindByID(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// Expected results from the database.
 	var expected []Track
@@ -200,7 +200,7 @@ func Test_FindByID(t *testing.T) {
 // Test if the correct count is returned when the database is empty.
 func Test_GetCount_Empty(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	expected := 0
 
@@ -223,7 +223,7 @@ func Test_GetCount_Empty(t *testing.T) {
 // Test if the correct count is returned when there are tracks in the database.
 func Test_GetCount(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	expected := 1
 
@@ -251,7 +251,7 @@ func Test_GetCount(t *testing.T) {
 // Method to test: GetNewID().
 // Test if the correct ID is returned, when the database is empty.
 func Test_GetNewID_Empty(t *testing.T) {
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// The expected ID to be generated.
 	expected := 1
@@ -272,7 +272,7 @@ func Test_GetNewID_Empty(t *testing.T) {
 // Method to test: GetNewID().
 // Test if the correct ID is returned, when the database has content.
 func Test_GetNewID(t *testing.T) {
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// Inserts 5 tracks to the database.
 	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
@@ -303,7 +303,7 @@ func Test_GetNewID(t *testing.T) {
 // Test if
 func Test_FindTrackHigherThen(t *testing.T) {
 	// Connects to the database.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 
 	// Inserts 5 tracks to the database.
 	database.Insert(Track{1, 11, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
@@ -337,7 +337,7 @@ func Test_FindTrackHigherThen(t *testing.T) {
 func Test_SortTrackByTimestamp(t *testing.T) {
 	// Connects the the database and inserts 3 tracks.
 	// The last inserted has the highest timestamp.
-	database := DatabaseInit("Tests")
+	database := DatabaseInit("TestTracks")
 	database.Insert(Track{1, 111, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
 	database.Insert(Track{2, 222, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
 	database.Insert(Track{3, 333, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})

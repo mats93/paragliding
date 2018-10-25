@@ -20,7 +20,7 @@ import (
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetTrackCount(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/admin/api/tracks_count", nil)
@@ -67,7 +67,7 @@ func Test_GetTrackCount(t *testing.T) {
 // Test to check the returned status code, content-type when the wrong method is used.
 func Test_DeleteAllTracks_WrongMethod(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Creates a request that is passed to the handler.
 	request, _ := http.NewRequest("GET", "/paragliding/admin/api/tracks", nil)
@@ -99,7 +99,7 @@ func Test_DeleteAllTracks_WrongMethod(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_DeleteAllTracks(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connets to the DB and fills it with 5 tracks.
 	database := mongodb.DatabaseInit(Collection)

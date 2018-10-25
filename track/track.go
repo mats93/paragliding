@@ -151,7 +151,7 @@ func insertNewTrack(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		// The decoding was sucessful.
-		// Adds the new track fr provided by the POST request.
+		// Adds the new track provided by the POST request.
 		trackFile, err := igc.ParseLocation(newURL.URL)
 
 		if err != nil {

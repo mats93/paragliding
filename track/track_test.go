@@ -71,7 +71,7 @@ func Test_GetAPIInfo(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function when the DB is empty.
 func Test_HandleTracks_EmptyDB(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database.
 	database := mongodb.DatabaseInit(Collection)
@@ -125,7 +125,7 @@ func Test_HandleTracks_EmptyDB(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_HandleTracks(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database and inserts 3 tracks.
 	database := mongodb.DatabaseInit(Collection)
@@ -253,7 +253,7 @@ func Test_HandleTracks_POST_WrongFile(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_HandleTracks_POST(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database.
 	database := mongodb.DatabaseInit(Collection)
@@ -335,7 +335,7 @@ func Test_GetTrackByID_NoTrackExists(t *testing.T) {
 // Test to check the returned status code, content-type and data for the function.
 func Test_GetTrackByID(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database, and adds test data to the DB.
 	database := mongodb.DatabaseInit(Collection)
@@ -414,7 +414,7 @@ func Test_GetDetailedTrack_WrongID(t *testing.T) {
 // Test to check the returned status code, content-type when a non existent field is passed.
 func Test_GetDetailedTrack_WrongField(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Connects the the database, and adds test data to the DB.
 	database := mongodb.DatabaseInit(Collection)
@@ -446,7 +446,7 @@ func Test_GetDetailedTrack_WrongField(t *testing.T) {
 // Test to check the returned status code, content-type and the data for the function.
 func Test_GetDetailedTrack(t *testing.T) {
 	// Injects the MongoDB collection to use.
-	Collection = "Tests"
+	Collection = "TestTracks"
 
 	// Expected pilot to be returned.
 	expectedPilot := "pilot1"
