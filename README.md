@@ -1,12 +1,24 @@
 # IGC track viewer extended
 Assignment 2 in the course IMT2681-2018 (Cloud Technologies) at NTNU Gjøvik.
 
-This application is a RESTful API to upload and browse [IGC files.](https://www.fai.org/sites/default/files/documents/igc_fr_spec_with_al4a_2016-4-10.pdf)
+This application is a RESTful API to upload and retrieve information about [IGC files.](https://www.fai.org/sites/default/files/documents/igc_fr_spec_with_al4a_2016-4-10.pdf)
 
 ***
 
 ## Available API calls:
 ### Tracks:
+Information:
+```
+Allows multiple people to upload and browse IGC files. IGC is an international file format for soaring track files
+that are used by paragliders and gliders. The program will store IGC files metadata in a NoSQL Database (MongoDB).
+
+To upload a new IGC file, do a POST request to "/paragliding/api/track", with the json object:
+{
+    "url": {
+      "type": "string"
+    }
+}
+```
 ```
 GET:  /paragliding/api                     - Returns information about the API.
 POST: /paragliding/api/track               - Takes the URL in an json format and inserts a new track, returns the tracks ID.
@@ -16,6 +28,13 @@ GET:  /paragliding/api/track/<id>/<field>  - Returns single detailed metadata ab
 ```
 
 ### Ticker:
+Information:
+```
+To facilitate sharing track information, the API allows people to search through the entire collection of tracks,
+by track ID, to obtain the details about a given track.
+The purpose of the ticker API is to notify dependant applications (such as complex IGC visualisation webapps)
+about the new tracks being available.
+```
 ```
 GET:  /paragliding/api/ticker/latest        - Returns the timestamp of the latest added track.
 GET:  /paragliding/api/ticker/              - Returns the JSON struct representing the ticker for the IGC tracks (array of max 5).
@@ -23,15 +42,27 @@ GET:  /paragliding/api/ticker/<timestamp>   - Returns the JSON struct representi
 ```
 
 ### Webhooks:
+Information:
+```
+Allow subscribing a webhook such that it can notify subscribers about the events in the system.
+Currently supports Discord Webhooks.
+
+To register a new webhook, do a POST request to "/paragliding/api/webhook/new_track" with a json object:
+{
+    "webhookURL": {
+      "type": "string"
+    },
+    "minTriggerValue": {
+      "type": "number"
+    }
+}
+Where "minTriggerValue" is how many tracks that need to be added before your webhook gets notified.
+This field is optional, if not provided it will be set to 1.
+```
 ```
 POST:   /paragliding/api/webhook/new_track/              - Registration of new webhook for notifications about tracks being added to the system. Returns the details about the registration
 GET:    /paragliding/api/webhook/new_track/<webhook_id>  - Accessing registered webhooks.
 DELETE: /paragliding/api/webhook/new_track/<webhook_id>  - Deleting registered webhooks.
-```
-### Admin:
-```
-GET:    /paragliding/admin/api/tracks_count   - Returns the current count of all tracks in the DB.
-DELETE: /paragliding/admin/api/tracks         - Deletes all tracks in the DB.
 ```
 
 ***

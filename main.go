@@ -37,9 +37,9 @@ func main() {
 	// Injects the MongoDB collection to use.
 	track.Collection = COLLECTION
 	ticker.Collection = COLLECTION
-	admin.Collection = COLLECTION
 	webhook.CollectionTrack = COLLECTION
 	webhook.CollectionWebhook = "Webhooks"
+	admin.Collection = COLLECTION
 
 	// Uses mux for regex matching on the HandleFunc paths.
 	router := mux.NewRouter()
