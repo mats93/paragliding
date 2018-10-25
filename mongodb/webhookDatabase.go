@@ -6,6 +6,7 @@
 package mongodb
 
 import (
+	"encoding/hex"
 	"errors"
 
 	"github.com/globalsign/mgo/bson"
@@ -107,16 +108,70 @@ func (m *MongoDB) InvokeWebhooks() ([]Webhook, error) {
 	}
 }
 
-// Finds a webhook by ID.
-func (m *MongoDB) FindWebhook(id int) (Webhook, error) {
-	var hook Webhook
+// Check if an ID can be a mongodb ID.
+func IsObjectIdHex(s string) bool {
+	if len(s) != 24 {
+		return false
+	}
+	_, err := hex.DecodeString(s)
+	return err == nil
+}
 
-	return hook, nil
+// Finds a webhook by ID.
+func (m *MongoDB) FindWebhook(id string) (Webhook, error) {
+	var result []Webhook
+	errorMessage := "not found"
+
+	// Check if the ID can be a mongodb ID.
+	if IsObjectIdHex(id) {
+		// True, find track with given 'id'.
+		err := MDB.C(m.Collection).Find(bson.M{"_id": bson.ObjectIdHex(id)}).All(&result)
+
+		// Generate error if webhook with given ID was not found.
+		if result == nil {
+			// Returns empty struct and the error.
+			err = errors.New(errorMessage)
+			return Webhook{}, err
+		}
+
+		// Returns the struct, and error if any.
+		return result[0], err
+	} else {
+		// False, return empty struct and error.
+		err := errors.New(errorMessage)
+		return Webhook{}, err
+	}
 }
 
 // Deletes a webhook with a given ID.
-func (m *MongoDB) DeleteWebhook(id int) (Webhook, error) {
-	var hook Webhook
+func (m *MongoDB) DeleteWebhook(id string) (Webhook, error) {
+	var result []Webhook
+	errorMessage := "not found"
 
-	return hook, nil
+	// Check if the ID can be a mongodb ID.
+	if IsObjectIdHex(id) {
+		// True, get the webhook that should be deleted.
+		err := MDB.C(m.Collection).Find(bson.M{"_id": bson.ObjectIdHex(id)}).All(&result)
+
+		// Generate error if webhook with given ID was not found.
+		if result == nil {
+			// Returns empty struct and the error.
+			err = errors.New(errorMessage)
+			return Webhook{}, err
+		}
+
+		// Delete the webhook from the database.
+		err = MDB.C(m.Collection).Remove(bson.M{"_id": bson.ObjectIdHex(id)})
+		if err != nil {
+			// Error in removing document, returns the error.
+			return Webhook{}, err
+		} else {
+			// Returns the deleted webhook and no error.
+			return result[0], nil
+		}
+	} else {
+		// False, return empty strcut and error.
+		err := errors.New(errorMessage)
+		return Webhook{}, err
+	}
 }
