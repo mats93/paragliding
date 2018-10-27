@@ -190,8 +190,8 @@ func Test_GetTimestamps(t *testing.T) {
 
 	// Expected timestamp to be returned.
 	expectedLatestJSON := "{\"t_latest\":333"
-	expectedStartJSON := "\"t_start\":333"
-	expectedStopJSON := "\"t_stop\":111"
+	expectedStartJSON := "\"t_start\":111"
+	expectedStopJSON := "\"t_stop\":333"
 	expectedIDsJSON := "\"tracks\":[1"
 
 	// The actual retuned data.
@@ -264,6 +264,40 @@ func Test_GetTimestampsNewerThen_Empty(t *testing.T) {
 		t.Errorf("Handler returned wrong data: got %s want %s",
 			actual, expected)
 	}
+}
+
+// Function to test: GetTimestampsNewerThen().
+// Test if error code is returend when highest timestmap is provided.
+func Test_GetTimestampsNewerThen_Highest(t *testing.T) {
+	// Injects the MongoDB collection to use.
+	Collection = "TestTracks"
+
+	// Connects the the database and inserts 3 tracks.
+	database := mongodb.DatabaseInit(Collection)
+	database.Insert(mongodb.Track{1, 111, time.Now(), "pilot1", "glider1", "glider_id1", 20.1, "http://test1.test"})
+	database.Insert(mongodb.Track{2, 222, time.Now(), "pilot2", "glider2", "glider_id2", 20.2, "http://test2.test"})
+	database.Insert(mongodb.Track{3, 333, time.Now(), "pilot3", "glider3", "glider_id3", 20.3, "http://test3.test"})
+
+	// Creates a request that is passed to the handler.
+	request, _ := http.NewRequest("GET", "/paragliding/api/ticker/333", nil)
+
+	// Creates the recorder and router.
+	recorder := httptest.NewRecorder()
+	router := mux.NewRouter()
+
+	// Tests the function.
+	router.HandleFunc("/paragliding/api/ticker/333", GetTimestampsNewerThen).Methods("GET")
+	router.ServeHTTP(recorder, request)
+
+	// Check the status code is what we expect (204).
+	status := recorder.Code
+	if status != http.StatusNoContent {
+		t.Errorf("Handler returned wrong status code: got %v want %v",
+			status, http.StatusNoContent)
+	}
+
+	// Removes the test data.
+	database.DeleteAll()
 }
 
 // Function to test: GetTimestampsNewerThen().

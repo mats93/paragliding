@@ -300,7 +300,7 @@ func Test_GetNewID(t *testing.T) {
 }
 
 // Method to test: FindTrackHigherThen().
-// Test if
+// Test if the correct tracks are returend.
 func Test_FindTrackHigherThen(t *testing.T) {
 	// Connects to the database.
 	database := DatabaseInit("TestTracks")
@@ -322,6 +322,17 @@ func Test_FindTrackHigherThen(t *testing.T) {
 
 	if actual != expected {
 		t.Errorf("Method queried the DB wrong: got %d length want %d length of slice",
+			actual, expected)
+	}
+
+	// The expected slice lengt when the highest timestamp is searched for.
+	// Slice should be of 0 length.
+	expected = 0
+	querie, _ = database.FindTrackHigherThen(15)
+	actual = len(querie)
+
+	if actual != expected {
+		t.Errorf("Method queried the DB wrong: got %d lenght want %d length of slice",
 			actual, expected)
 	}
 

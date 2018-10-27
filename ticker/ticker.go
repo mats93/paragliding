@@ -86,6 +86,10 @@ func GetTimestamps(w http.ResponseWriter, r *http.Request) {
 		// Lengt of the track slice (-1 = last index used).
 		len := len(tracks) - 1
 
+		// t_latest: Siste stamp
+		// t_start: Første stamp
+		// t_stop: siste stamp for siste ID i array.
+
 		// Last added timestamp (Last index in the DB).
 		newTimestamp.TimeLatest = tracks[len].Timestamp
 
@@ -93,8 +97,7 @@ func GetTimestamps(w http.ResponseWriter, r *http.Request) {
 		sortedTracks := mongodb.SortTrackByTimestamp(tracks)
 
 		// Adds timestamps to Timestamp struct.
-		newTimestamp.TimeStart = sortedTracks[0].Timestamp
-		newTimestamp.TimeStop = sortedTracks[len].Timestamp
+		newTimestamp.TimeStart = sortedTracks[len].Timestamp
 
 		// The max allowed IDs to be returned.
 		var maxLoops int
@@ -103,6 +106,9 @@ func GetTimestamps(w http.ResponseWriter, r *http.Request) {
 		} else {
 			maxLoops = len
 		}
+
+		// The last added timestamp for the last ID in the slice.
+		newTimestamp.TimeStop = tracks[maxLoops].Timestamp
 
 		// Adds the IDs to the slice.
 		for i := 0; i <= maxLoops; i++ {
@@ -165,8 +171,7 @@ func GetTimestampsNewerThen(w http.ResponseWriter, r *http.Request) {
 		sortedTracks := mongodb.SortTrackByTimestamp(tracks)
 
 		// Adds timestamps to Timestamp struct.
-		newTimestamp.TimeStart = sortedTracks[0].Timestamp
-		newTimestamp.TimeStop = sortedTracks[len].Timestamp
+		newTimestamp.TimeStart = sortedTracks[len].Timestamp
 
 		// The max allowed IDs to be returned.
 		var maxLoops int
@@ -175,6 +180,9 @@ func GetTimestampsNewerThen(w http.ResponseWriter, r *http.Request) {
 		} else {
 			maxLoops = len
 		}
+
+		// The last added timestamp for the last ID in the slice.
+		newTimestamp.TimeStop = tracks[maxLoops].Timestamp
 
 		// Adds the IDs to the slice.
 		for i := 0; i <= maxLoops; i++ {
