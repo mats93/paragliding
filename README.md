@@ -12,7 +12,7 @@ Information:
 Allows multiple people to upload and browse IGC files. IGC is an international file format for soaring track files
 that are used by paragliders and gliders. The program will store IGC files metadata in a NoSQL Database (MongoDB).
 
-To upload a new IGC file, do a POST request to "/paragliding/api/track", with the json object:
+To upload a new IGC file, do a POST request to "/paragliding/api/track" with a json object:
 {
     "url": {
       "type": "string"
