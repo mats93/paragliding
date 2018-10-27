@@ -71,7 +71,7 @@ DELETE: /paragliding/api/webhook/new_track/<webhook_id>  - Deleting registered w
  * The app runs in Heroku at https://paragliding-api.herokuapp.com/
  * The database (MongoDB) is stored in [mlab.com](https://mlab.com/) MongoLabs Sandbox.
  * The ticker end-point is implemented within the Heroku deployment (as part of the API).
- * The "clock" trigger is implemented in Go as an independent executable deployed on OpenStack [(link Temp)](https://google.com)
+ * The "clock trigger" is implemented in Go as an independent executable deployed on OpenStack [(link)](https://github.com/mats93/Clock-trigger)
 
 ***
 ## Application testing
