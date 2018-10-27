@@ -27,7 +27,7 @@ import (
 // COLLECTION is the collection to be used when the main app is running.
 const COLLECTION = "Tracks"
 
-// The start time for the API service.
+// StartTime is the start time for the API service.
 var startTime = time.Now()
 
 func main() {
@@ -62,8 +62,10 @@ func main() {
 	router.HandleFunc("/paragliding/api/webhook/new_track/{id:[a-z-A-Z-0-9]+}", webhook.HandleWebhooks)
 
 	// Admin:
+	/* Did not have time to implemet authentication, admin API is turned of.
 	router.HandleFunc("/paragliding/admin/api/tracks_count", admin.GetTrackCount)
 	router.HandleFunc("/paragliding/admin/api/tracks", admin.DeleteAllTracks)
+	*/
 
 	// Gets the port from enviroment var.
 	port := os.Getenv("PORT")
